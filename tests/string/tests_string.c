@@ -278,6 +278,7 @@ void test_string_struct_functions_not_null(void)
     ASSERT_NOT_NULL(funcs->clone);
     ASSERT_NOT_NULL(funcs->to_lower);
     ASSERT_NOT_NULL(funcs->to_upper);
+    ASSERT_NOT_NULL(funcs->index_of);
 }
 
 void test_string_struct_singleton(void)
@@ -446,6 +447,144 @@ void test_to_upper_null(void)
 }
 
 // ============================================================================
+// Test Functions for String()->index_of
+// ============================================================================
+
+void test_index_of_pchar_found(void)
+{
+    string *s = String()->new("hello world");
+    const char *needle = "world";
+    int idx = String()->index_of(s, TYPE_PCHAR, (void *)&needle);
+    ASSERT_EQ(idx, 6);
+    String()->del(&s);
+}
+
+void test_index_of_pchar_not_found(void)
+{
+    string *s = String()->new("hello world");
+    const char *needle = "foo";
+    int idx = String()->index_of(s, TYPE_PCHAR, (void *)&needle);
+    ASSERT_EQ(idx, -1);
+    String()->del(&s);
+}
+
+void test_index_of_pchar_at_start(void)
+{
+    string *s = String()->new("hello world");
+    const char *needle = "hello";
+    int idx = String()->index_of(s, TYPE_PCHAR, (void *)&needle);
+    ASSERT_EQ(idx, 0);
+    String()->del(&s);
+}
+
+void test_index_of_pchar_at_end(void)
+{
+    string *s = String()->new("hello world");
+    const char *needle = "ld";
+    int idx = String()->index_of(s, TYPE_PCHAR, (void *)&needle);
+    ASSERT_EQ(idx, 9);
+    String()->del(&s);
+}
+
+void test_index_of_char_found(void)
+{
+    string *s = String()->new("hello world");
+    char c = 'w';
+    int idx = String()->index_of(s, TYPE_CHAR, &c);
+    ASSERT_EQ(idx, 6);
+    String()->del(&s);
+}
+
+void test_index_of_char_not_found(void)
+{
+    string *s = String()->new("hello world");
+    char c = 'z';
+    int idx = String()->index_of(s, TYPE_CHAR, &c);
+    ASSERT_EQ(idx, -1);
+    String()->del(&s);
+}
+
+void test_index_of_char_first(void)
+{
+    string *s = String()->new("hello world");
+    char c = 'h';
+    int idx = String()->index_of(s, TYPE_CHAR, &c);
+    ASSERT_EQ(idx, 0);
+    String()->del(&s);
+}
+
+void test_index_of_int_found(void)
+{
+    string *s = String()->new("value is 42 here");
+    int n = 42;
+    int idx = String()->index_of(s, TYPE_INT, &n);
+    ASSERT_EQ(idx, 9);
+    String()->del(&s);
+}
+
+void test_index_of_int_not_found(void)
+{
+    string *s = String()->new("value is 42 here");
+    int n = 99;
+    int idx = String()->index_of(s, TYPE_INT, &n);
+    ASSERT_EQ(idx, -1);
+    String()->del(&s);
+}
+
+void test_index_of_int_negative(void)
+{
+    string *s = String()->new("temp is -10 degrees");
+    int n = -10;
+    int idx = String()->index_of(s, TYPE_INT, &n);
+    ASSERT_EQ(idx, 8);
+    String()->del(&s);
+}
+
+void test_index_of_string(void)
+{
+    string *s = String()->new("hello world");
+    string *needle = String()->new("world");
+    int idx = String()->index_of(s, TYPE_STRING, needle);
+    ASSERT_EQ(idx, 6);
+    String()->del(&s);
+    String()->del(&needle);
+}
+
+void test_index_of_string_not_found(void)
+{
+    string *s = String()->new("hello world");
+    string *needle = String()->new("foo");
+    int idx = String()->index_of(s, TYPE_STRING, needle);
+    ASSERT_EQ(idx, -1);
+    String()->del(&s);
+    String()->del(&needle);
+}
+
+void test_index_of_empty_string(void)
+{
+    string *s = String()->new("");
+    const char *needle = "test";
+    int idx = String()->index_of(s, TYPE_PCHAR, (void *)&needle);
+    ASSERT_EQ(idx, -1);
+    String()->del(&s);
+}
+
+void test_index_of_null_string(void)
+{
+    const char *needle = "test";
+    int idx = String()->index_of(NULL, TYPE_PCHAR, (void *)&needle);
+    ASSERT_EQ(idx, -1);
+}
+
+void test_index_of_null_value(void)
+{
+    string *s = String()->new("hello world");
+    int idx = String()->index_of(s, TYPE_PCHAR, NULL);
+    ASSERT_EQ(idx, -1);
+    String()->del(&s);
+}
+
+// ============================================================================
 // Edge Cases
 // ============================================================================
 
@@ -590,6 +729,27 @@ int main(int argc, char **argv)
     TEST("to_upper: with numbers", test_to_upper_with_numbers());
     TEST("to_upper: empty string", test_to_upper_empty());
     TEST_NULL_SAFE("to_upper: NULL input", test_to_upper_null());
+    
+    // ─────────────────────────────────────────────────────────────────────
+    // String()->index_of tests
+    // ─────────────────────────────────────────────────────────────────────
+    print_suite_header("String()->index_of");
+    
+    TEST("index_of: pchar found", test_index_of_pchar_found());
+    TEST("index_of: pchar not found", test_index_of_pchar_not_found());
+    TEST("index_of: pchar at start", test_index_of_pchar_at_start());
+    TEST("index_of: pchar at end", test_index_of_pchar_at_end());
+    TEST("index_of: char found", test_index_of_char_found());
+    TEST("index_of: char not found", test_index_of_char_not_found());
+    TEST("index_of: char first", test_index_of_char_first());
+    TEST("index_of: int found", test_index_of_int_found());
+    TEST("index_of: int not found", test_index_of_int_not_found());
+    TEST("index_of: int negative", test_index_of_int_negative());
+    TEST("index_of: string found", test_index_of_string());
+    TEST("index_of: string not found", test_index_of_string_not_found());
+    TEST("index_of: empty string", test_index_of_empty_string());
+    TEST_NULL_SAFE("index_of: NULL string", test_index_of_null_string());
+    TEST_NULL_SAFE("index_of: NULL value", test_index_of_null_value());
     
     // ─────────────────────────────────────────────────────────────────────
     // Edge case tests
