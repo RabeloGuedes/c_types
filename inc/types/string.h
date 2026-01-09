@@ -21,6 +21,7 @@ typedef struct string_metohods
     string  *(*clone)(string *);
     void    (*to_lower)(string *);
     void    (*to_upper)(string *);
+    int     (*index_of)(const string *, append_type, void *);
 }   str_funcs;
 
 

@@ -349,6 +349,83 @@ void  upper_string(string *str)
   }  
 }
 
+/// @brief This function searches for a string inside another one and returns
+/// the position where it starts in the searched string.
+/// @param str 
+/// @param to_find 
+/// @return 
+int find_string(char *str, char *to_find)
+{
+  int i;
+  int j;
+
+  if (!str || !to_find)
+    return (-1);
+  i = 0;
+  while (str[i])
+  {
+    j = 0;
+    while (str[i + j] && to_find[j] && str[i + j] == to_find[j])
+    {
+      if (!to_find[j + 1])
+        return (i);
+      j++;
+    }
+    i++;
+  }
+  return (-1);
+}
+
+/// @brief Returns the index of the first match of the given value argument.
+/// @param str 
+/// @param type 
+/// @param value 
+/// @return integer
+int  index_of_element(const string *str, append_type type, void *value)
+{
+  char  *ptr;
+  int   index;
+
+  if (!str || !str->s || !value)
+    return (-1);
+  switch (type)
+  {
+    case TYPE_STRING:
+      ptr = calloc(((string *)value)->capacity, sizeof(char));
+      if (!ptr)
+        return (-1);
+      memorycopy(ptr, ((string *)value)->s, ((string *)value)->capacity);
+      break ;
+    case TYPE_PCHAR:
+      ptr = calloc(stringlen(*(char **)value) + 1, sizeof(char));
+      if (!ptr)
+        return (-1);
+      memorycopy(ptr, *(char **)value, stringlen(*(char **)value));
+      break ;
+    case TYPE_CHAR:
+      ptr = calloc(2, sizeof(char));
+      if (!ptr)
+        return (-1);
+      *ptr = *(char *)value;
+      break ;
+    case TYPE_INT:
+      ptr = int_to_ascii(*(int *)value);
+      if (!ptr)
+        return (-1);
+      break ;
+    case TYPE_LLONG:
+      ptr = llong_to_ascii(*(long *)value);
+      if (!ptr)
+        return (-1);
+      break ;
+    default:
+      return (-1);
+  }
+  index = find_string(str->s, ptr);
+  free(ptr);
+  return (index);
+}
+
 /// @brief This function returns a struct with all functions that
 /// can be used with the string type.
 /// @param  
@@ -365,5 +442,6 @@ str_funcs   *String(void)
   string_functions.clone = &copy_string;
   string_functions.to_lower = &lower_string;
   string_functions.to_upper = &upper_string;
+  string_functions.index_of = &index_of_element;
   return (&string_functions);
 }
