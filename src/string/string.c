@@ -42,7 +42,7 @@ void  dealloc_string(string **str)
   free((*str)->s);
   memoryset(*str, 0, sizeof(string));
   free(*str);
-  str = NULL;
+  *str = NULL;
 }
 
 /// @brief Reads the length of the string.
@@ -50,6 +50,8 @@ void  dealloc_string(string **str)
 /// @return unsigned long long. (i.e: 'get_string_len(string("hello"))-> 5')
 ui64  get_string_len(const string *str)
 {
+  if (!str)
+    return (0);
   return (str->len);
 }
 
@@ -58,7 +60,7 @@ ui64  get_string_len(const string *str)
 /// @param str 
 void  print_string(int fd, const string *str)
 {
-  if (!str->s)
+  if (!str || !str->s)
   {
     write(fd, "NULL", 4);
     return ;
@@ -239,7 +241,7 @@ void  append_to_string(string *str, append_type type, void *value)
       append_str_to_string(str, (string *)value);
       break ;
     case TYPE_PCHAR:
-      append_pchar_to_string(str, (const char *)value);
+      append_pchar_to_string(str, *(const char **)value);
       break ;
     case TYPE_CHAR:
       append_char_to_string(str, *(char *)value);
