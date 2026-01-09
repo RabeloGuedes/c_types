@@ -116,7 +116,7 @@ char  *llong_to_ascii(long long n)
     ptr[0] = '-';
   while (n)
   {
-    ptr[len--] = ((n % 10) * ((n >> 31) | 1)) + 48;
+    ptr[len--] = ((n % 10) * ((n >> 63) | 1)) + 48;
     n /= 10;
   }
   return (ptr);
