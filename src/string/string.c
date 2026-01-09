@@ -231,6 +231,10 @@ void  append_llong_to_string(string *str, long long l)
   str->s[total_len] = '\0';
 }
 
+/// @brief Appends the given value argument into the string.
+/// @param str 
+/// @param type 
+/// @param value
 void  append_to_string(string *str, append_type type, void *value)
 {
   if (!str || !value)
@@ -257,6 +261,98 @@ void  append_to_string(string *str, append_type type, void *value)
   }
 }
 
+/// @brief Compares the string content with a pointer to char.
+/// @param str 
+/// @param cmp 
+/// @return int (1 if equal, 0 if not equal)
+int  equals_string(const string *str, const char *cmp)
+{
+  ui64  cmp_len;
+  ui64  i;
+
+  if (!str || !cmp)
+    return (!str && !cmp);
+  if (!str->s)
+    return (0);
+  cmp_len = stringlen((char *)cmp);
+  if (str->len != cmp_len)
+    return (0);
+  i = 0;
+  while (i < str->len)
+  {
+    if (str->s[i] != cmp[i])
+      return (0);
+    i++;
+  }
+  return (1);
+}
+
+/// @brief Creates a exactly deep copy of the given string.
+/// @param str 
+/// @return string (i.e: 'copy_string(string("hello"))-> string(hello)')
+string  *copy_string(string *str)
+{
+  string  *ptr;
+
+  if (!str || !str->s)
+    return (NULL);
+  ptr = calloc(1, sizeof(string));
+  if (!ptr)
+    return (NULL);
+  ptr->capacity = str->capacity;
+  ptr->len = str->len;
+  ptr->s = calloc(ptr->capacity, sizeof(char));
+  if (!ptr->s)
+  {
+    free(ptr);
+    return (NULL);
+  }
+  memorycopy(ptr->s, str->s, str->len);
+  return (ptr);
+}
+
+/// @brief Converts all upper case character to lower case.
+/// @param str 
+void  lower_string(string *str)
+{
+  char  *ptr;
+  ui64  len;
+
+  if (!str || !str->s)
+    return ;
+  ptr = str->s;
+  len = str->len;
+  while (len--)
+  {
+    if (*ptr >= 'A' && *ptr <= 'Z')
+      *ptr = *ptr + 'a' - 'A';
+    ptr++;
+  }  
+}
+
+/// @brief Converts all lower case character to upper case.
+/// @param str 
+void  upper_string(string *str)
+{
+  char  *ptr;
+  ui64  len;
+
+  if (!str || !str->s)
+    return ;
+  ptr = str->s;
+  len = str->len;
+  while (len--)
+  {
+    if (*ptr >= 'a' && *ptr <= 'z')
+      *ptr = *ptr + 'A' - 'a';
+    ptr++;
+  }  
+}
+
+/// @brief This function returns a struct with all functions that
+/// can be used with the string type.
+/// @param  
+/// @return str_funcs
 str_funcs   *String(void)
 {
   static  str_funcs string_functions;
@@ -266,5 +362,8 @@ str_funcs   *String(void)
   string_functions.del = &dealloc_string;
   string_functions.new = &new_string;
   string_functions.append = &append_to_string;
+  string_functions.clone = &copy_string;
+  string_functions.to_lower = &lower_string;
+  string_functions.to_upper = &upper_string;
   return (&string_functions);
 }

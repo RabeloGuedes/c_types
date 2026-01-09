@@ -18,10 +18,14 @@ typedef struct string_metohods
     void    (*write)(int, const string *);
     void    (*del)(string **);
     void    (*append)(string *, append_type, void *);
+    string  *(*clone)(string *);
+    void    (*to_lower)(string *);
+    void    (*to_upper)(string *);
 }   str_funcs;
 
 
 string      *new_string(char *s);
+int         equals_string(const string *, const char *);
 str_funcs   *String(void);
 
 #endif
