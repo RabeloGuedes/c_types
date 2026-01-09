@@ -11,6 +11,7 @@ void test_new_basic(void)
     string *s = String()->new("hello");
     ASSERT_NOT_NULL(s);
     ASSERT_EQ(String()->len(s), 5);
+    ASSERT(equals_string(s, "hello"));
     String()->del(&s);
 }
 
@@ -31,6 +32,7 @@ void test_new_long_string(void)
     string *s = String()->new(long_str);
     ASSERT_NOT_NULL(s);
     ASSERT_EQ(String()->len(s), 1023);
+    ASSERT(equals_string(s, long_str));
     String()->del(&s);
 }
 
@@ -141,6 +143,7 @@ void test_append_pchar(void)
     const char *suffix = " world";
     String()->append(s, TYPE_PCHAR, (void *)&suffix);
     ASSERT_EQ(String()->len(s), 11);
+    ASSERT(equals_string(s, "hello world"));
     String()->del(&s);
 }
 
@@ -150,6 +153,7 @@ void test_append_string(void)
     string *s2 = String()->new(" world");
     String()->append(s1, TYPE_STRING, s2);
     ASSERT_EQ(String()->len(s1), 11);
+    ASSERT(equals_string(s1, "hello world"));
     String()->del(&s1);
     String()->del(&s2);
 }
@@ -160,6 +164,7 @@ void test_append_char(void)
     char c = 'o';
     String()->append(s, TYPE_CHAR, &c);
     ASSERT_EQ(String()->len(s), 5);
+    ASSERT(equals_string(s, "hello"));
     String()->del(&s);
 }
 
@@ -169,6 +174,7 @@ void test_append_int(void)
     int n = 42;
     String()->append(s, TYPE_INT, &n);
     ASSERT_EQ(String()->len(s), 7);
+    ASSERT(equals_string(s, "num: 42"));
     String()->del(&s);
 }
 
@@ -177,7 +183,8 @@ void test_append_int_negative(void)
     string *s = String()->new("num: ");
     int n = -42;
     String()->append(s, TYPE_INT, &n);
-    ASSERT_EQ(String()->len(s), 8);  // "num: -42"
+    ASSERT_EQ(String()->len(s), 8);
+    ASSERT(equals_string(s, "num: -42"));
     String()->del(&s);
 }
 
@@ -187,6 +194,7 @@ void test_append_llong(void)
     long long n = 9223372036854775807LL;
     String()->append(s, TYPE_LLONG, &n);
     ASSERT_NOT_NULL(s);
+    ASSERT(equals_string(s, "big: 9223372036854775807"));
     String()->del(&s);
 }
 
@@ -196,6 +204,7 @@ void test_append_llong_negative(void)
     long long n = -9223372036854775807LL;
     String()->append(s, TYPE_LLONG, &n);
     ASSERT_NOT_NULL(s);
+    ASSERT(equals_string(s, "neg: -9223372036854775807"));
     String()->del(&s);
 }
 
@@ -218,6 +227,7 @@ void test_append_empty_pchar(void)
     const char *empty = "";
     String()->append(s, TYPE_PCHAR, (void *)&empty);
     ASSERT_EQ(String()->len(s), 5);
+    ASSERT(equals_string(s, "hello"));
     String()->del(&s);
 }
 
@@ -233,6 +243,7 @@ void test_append_multiple(void)
     String()->append(s, TYPE_PCHAR, (void *)&world);
     
     ASSERT_EQ(String()->len(s), 11);
+    ASSERT(equals_string(s, "hello world"));
     String()->del(&s);
 }
 
@@ -241,7 +252,8 @@ void test_append_int_zero(void)
     string *s = String()->new("zero: ");
     int n = 0;
     String()->append(s, TYPE_INT, &n);
-    ASSERT_EQ(String()->len(s), 7);  // "zero: 0"
+    ASSERT_EQ(String()->len(s), 7);
+    ASSERT(equals_string(s, "zero: 0"));
     String()->del(&s);
 }
 
@@ -263,6 +275,9 @@ void test_string_struct_functions_not_null(void)
     ASSERT_NOT_NULL(funcs->write);
     ASSERT_NOT_NULL(funcs->del);
     ASSERT_NOT_NULL(funcs->append);
+    ASSERT_NOT_NULL(funcs->clone);
+    ASSERT_NOT_NULL(funcs->to_lower);
+    ASSERT_NOT_NULL(funcs->to_upper);
 }
 
 void test_string_struct_singleton(void)
@@ -270,6 +285,164 @@ void test_string_struct_singleton(void)
     str_funcs *funcs1 = String();
     str_funcs *funcs2 = String();
     ASSERT_EQ(funcs1, funcs2);  // Should return same static struct
+}
+
+// ============================================================================
+// Test Functions for String()->clone
+// ============================================================================
+
+void test_clone_basic(void)
+{
+    string *s = String()->new("hello world");
+    string *clone = String()->clone(s);
+    ASSERT_NOT_NULL(clone);
+    ASSERT_EQ(String()->len(clone), String()->len(s));
+    ASSERT_NE(clone, s);  // Should be different pointers
+    ASSERT(equals_string(clone, "hello world"));
+    ASSERT(equals_string(s, "hello world"));  // Both have same content
+    String()->del(&s);
+    String()->del(&clone);
+}
+
+void test_clone_empty(void)
+{
+    string *s = String()->new("");
+    string *clone = String()->clone(s);
+    ASSERT_NOT_NULL(clone);
+    ASSERT_EQ(String()->len(clone), 0);
+    String()->del(&s);
+    String()->del(&clone);
+}
+
+void test_clone_null(void)
+{
+    string *clone = String()->clone(NULL);
+    ASSERT_NULL(clone);
+}
+
+void test_clone_independence(void)
+{
+    string *s = String()->new("original");
+    string *clone = String()->clone(s);
+    
+    // Modify original
+    const char *suffix = " modified";
+    String()->append(s, TYPE_PCHAR, (void *)&suffix);
+    
+    // Clone should remain unchanged
+    ASSERT_EQ(String()->len(clone), 8);
+    ASSERT(equals_string(clone, "original"));
+    ASSERT_EQ(String()->len(s), 17);
+    ASSERT(equals_string(s, "original modified"));
+    
+    String()->del(&s);
+    String()->del(&clone);
+}
+
+// ============================================================================
+// Test Functions for String()->to_lower
+// ============================================================================
+
+void test_to_lower_basic(void)
+{
+    string *s = String()->new("HELLO WORLD");
+    String()->to_lower(s);
+    ASSERT_EQ(String()->len(s), 11);
+    ASSERT(equals_string(s, "hello world"));
+    String()->del(&s);
+}
+
+void test_to_lower_mixed(void)
+{
+    string *s = String()->new("HeLLo WoRLd");
+    String()->to_lower(s);
+    ASSERT_EQ(String()->len(s), 11);
+    ASSERT(equals_string(s, "hello world"));
+    String()->del(&s);
+}
+
+void test_to_lower_already_lower(void)
+{
+    string *s = String()->new("hello world");
+    String()->to_lower(s);
+    ASSERT_EQ(String()->len(s), 11);
+    ASSERT(equals_string(s, "hello world"));
+    String()->del(&s);
+}
+
+void test_to_lower_with_numbers(void)
+{
+    string *s = String()->new("HELLO123WORLD");
+    String()->to_lower(s);
+    ASSERT_EQ(String()->len(s), 13);
+    ASSERT(equals_string(s, "hello123world"));
+    String()->del(&s);
+}
+
+void test_to_lower_empty(void)
+{
+    string *s = String()->new("");
+    String()->to_lower(s);
+    ASSERT_EQ(String()->len(s), 0);
+    String()->del(&s);
+}
+
+void test_to_lower_null(void)
+{
+    String()->to_lower(NULL);
+}
+
+// ============================================================================
+// Test Functions for String()->to_upper
+// ============================================================================
+
+void test_to_upper_basic(void)
+{
+    string *s = String()->new("hello world");
+    String()->to_upper(s);
+    ASSERT_EQ(String()->len(s), 11);
+    ASSERT(equals_string(s, "HELLO WORLD"));
+    String()->del(&s);
+}
+
+void test_to_upper_mixed(void)
+{
+    string *s = String()->new("HeLLo WoRLd");
+    String()->to_upper(s);
+    ASSERT_EQ(String()->len(s), 11);
+    ASSERT(equals_string(s, "HELLO WORLD"));
+    String()->del(&s);
+}
+
+void test_to_upper_already_upper(void)
+{
+    string *s = String()->new("HELLO WORLD");
+    String()->to_upper(s);
+    ASSERT_EQ(String()->len(s), 11);
+    ASSERT(equals_string(s, "HELLO WORLD"));
+    String()->del(&s);
+}
+
+void test_to_upper_with_numbers(void)
+{
+    string *s = String()->new("hello123world");
+    String()->to_upper(s);
+    ASSERT_EQ(String()->len(s), 13);
+    ASSERT(equals_string(s, "HELLO123WORLD"));
+    String()->del(&s);
+}
+
+void test_to_upper_empty(void)
+{
+    string *s = String()->new("");
+    String()->to_upper(s);
+    ASSERT_EQ(String()->len(s), 0);
+    String()->del(&s);
+}
+
+void test_to_upper_null(void)
+{
+    String()->to_upper(NULL);
 }
 
 // ============================================================================
@@ -383,6 +556,40 @@ int main(int argc, char **argv)
     TEST("struct: not null", test_string_struct_not_null());
     TEST("struct: functions not null", test_string_struct_functions_not_null());
     TEST("struct: singleton pattern", test_string_struct_singleton());
+    
+    // ─────────────────────────────────────────────────────────────────────
+    // String()->clone tests
+    // ─────────────────────────────────────────────────────────────────────
+    print_suite_header("String()->clone");
+    
+    TEST("clone: basic", test_clone_basic());
+    TEST("clone: empty string", test_clone_empty());
+    TEST_NULL_SAFE("clone: NULL input", test_clone_null());
+    TEST("clone: independence", test_clone_independence());
+    
+    // ─────────────────────────────────────────────────────────────────────
+    // String()->to_lower tests
+    // ─────────────────────────────────────────────────────────────────────
+    print_suite_header("String()->to_lower");
+    
+    TEST("to_lower: basic", test_to_lower_basic());
+    TEST("to_lower: mixed case", test_to_lower_mixed());
+    TEST("to_lower: already lowercase", test_to_lower_already_lower());
+    TEST("to_lower: with numbers", test_to_lower_with_numbers());
+    TEST("to_lower: empty string", test_to_lower_empty());
+    TEST_NULL_SAFE("to_lower: NULL input", test_to_lower_null());
+    
+    // ─────────────────────────────────────────────────────────────────────
+    // String()->to_upper tests
+    // ─────────────────────────────────────────────────────────────────────
+    print_suite_header("String()->to_upper");
+    
+    TEST("to_upper: basic", test_to_upper_basic());
+    TEST("to_upper: mixed case", test_to_upper_mixed());
+    TEST("to_upper: already uppercase", test_to_upper_already_upper());
+    TEST("to_upper: with numbers", test_to_upper_with_numbers());
+    TEST("to_upper: empty string", test_to_upper_empty());
+    TEST_NULL_SAFE("to_upper: NULL input", test_to_upper_null());
     
     // ─────────────────────────────────────────────────────────────────────
     // Edge case tests
