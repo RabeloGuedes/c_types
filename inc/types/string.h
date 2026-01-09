@@ -2,11 +2,26 @@
 # define TYPES_STRING_H
 
 # include <types/utils.h>
+typedef enum {
+    TYPE_STRING,
+    TYPE_PCHAR,
+    TYPE_CHAR,
+    TYPE_INT,
+    TYPE_LLONG
+}   append_type;
 
 typedef struct string string;
+typedef struct string_metohods 
+{
+    string  *(*new)(char *);
+    ui64    (*len)(const string *);
+    void    (*write)(int, const string *);
+    void    (*del)(string **);
+    void    (*append)(string *, append_type, void *);
+}   str_funcs;
 
-string  *new_string(char *s);
-ui64    get_string_len(const string *str);
-void    print_string(int fd, const string *str);
-void    dealloc_string(string **str);
+
+string      *new_string(char *s);
+str_funcs   *String(void);
+
 #endif
