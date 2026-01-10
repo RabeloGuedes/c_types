@@ -279,6 +279,7 @@ void test_string_struct_functions_not_null(void)
     ASSERT_NOT_NULL(funcs->to_lower);
     ASSERT_NOT_NULL(funcs->to_upper);
     ASSERT_NOT_NULL(funcs->index_of);
+    ASSERT_NOT_NULL(funcs->last_index_of);
 }
 
 void test_string_struct_singleton(void)
@@ -585,6 +586,143 @@ void test_index_of_null_value(void)
 }
 
 // ============================================================================
+// Test Functions for String()->last_index_of
+// ============================================================================
+
+void test_last_index_of_pchar_single(void)
+{
+    string *s = String()->new("hello world");
+    const char *needle = "world";
+    int idx = String()->last_index_of(s, TYPE_PCHAR, (void *)&needle);
+    ASSERT_EQ(idx, 6);
+    String()->del(&s);
+}
+
+void test_last_index_of_pchar_multiple(void)
+{
+    string *s = String()->new("hello hello hello");
+    const char *needle = "hello";
+    int idx = String()->last_index_of(s, TYPE_PCHAR, (void *)&needle);
+    ASSERT_EQ(idx, 12);  // Last "hello" starts at index 12
+    String()->del(&s);
+}
+
+void test_last_index_of_pchar_not_found(void)
+{
+    string *s = String()->new("hello world");
+    const char *needle = "foo";
+    int idx = String()->last_index_of(s, TYPE_PCHAR, (void *)&needle);
+    ASSERT_EQ(idx, -1);
+    String()->del(&s);
+}
+
+void test_last_index_of_pchar_at_start(void)
+{
+    string *s = String()->new("hello");
+    const char *needle = "hello";
+    int idx = String()->last_index_of(s, TYPE_PCHAR, (void *)&needle);
+    ASSERT_EQ(idx, 0);  // Only occurrence is at start
+    String()->del(&s);
+}
+
+void test_last_index_of_pchar_at_end(void)
+{
+    string *s = String()->new("world world");
+    const char *needle = "world";
+    int idx = String()->last_index_of(s, TYPE_PCHAR, (void *)&needle);
+    ASSERT_EQ(idx, 6);  // Last "world" at index 6
+    String()->del(&s);
+}
+
+void test_last_index_of_char_single(void)
+{
+    string *s = String()->new("hello");
+    char c = 'e';
+    int idx = String()->last_index_of(s, TYPE_CHAR, &c);
+    ASSERT_EQ(idx, 1);
+    String()->del(&s);
+}
+
+void test_last_index_of_char_multiple(void)
+{
+    string *s = String()->new("hello world");
+    char c = 'l';
+    int idx = String()->last_index_of(s, TYPE_CHAR, &c);
+    ASSERT_EQ(idx, 9);  // Last 'l' is at index 9 in "world"
+    String()->del(&s);
+}
+
+void test_last_index_of_char_not_found(void)
+{
+    string *s = String()->new("hello world");
+    char c = 'z';
+    int idx = String()->last_index_of(s, TYPE_CHAR, &c);
+    ASSERT_EQ(idx, -1);
+    String()->del(&s);
+}
+
+void test_last_index_of_int_single(void)
+{
+    string *s = String()->new("value is 42");
+    int n = 42;
+    int idx = String()->last_index_of(s, TYPE_INT, &n);
+    ASSERT_EQ(idx, 9);
+    String()->del(&s);
+}
+
+void test_last_index_of_int_multiple(void)
+{
+    string *s = String()->new("42 plus 42 equals 84");
+    int n = 42;
+    int idx = String()->last_index_of(s, TYPE_INT, &n);
+    ASSERT_EQ(idx, 8);  // Last "42" at index 8
+    String()->del(&s);
+}
+
+void test_last_index_of_int_not_found(void)
+{
+    string *s = String()->new("value is 42");
+    int n = 99;
+    int idx = String()->last_index_of(s, TYPE_INT, &n);
+    ASSERT_EQ(idx, -1);
+    String()->del(&s);
+}
+
+void test_last_index_of_string(void)
+{
+    string *s = String()->new("test test test");
+    string *needle = String()->new("test");
+    int idx = String()->last_index_of(s, TYPE_STRING, needle);
+    ASSERT_EQ(idx, 10);  // Last "test" at index 10
+    String()->del(&s);
+    String()->del(&needle);
+}
+
+void test_last_index_of_empty_string(void)
+{
+    string *s = String()->new("");
+    const char *needle = "test";
+    int idx = String()->last_index_of(s, TYPE_PCHAR, (void *)&needle);
+    ASSERT_EQ(idx, -1);
+    String()->del(&s);
+}
+
+void test_last_index_of_null_string(void)
+{
+    const char *needle = "test";
+    int idx = String()->last_index_of(NULL, TYPE_PCHAR, (void *)&needle);
+    ASSERT_EQ(idx, -1);
+}
+
+void test_last_index_of_null_value(void)
+{
+    string *s = String()->new("hello world");
+    int idx = String()->last_index_of(s, TYPE_PCHAR, NULL);
+    ASSERT_EQ(idx, -1);
+    String()->del(&s);
+}
+
+// ============================================================================
 // Edge Cases
 // ============================================================================
 
@@ -750,6 +888,27 @@ int main(int argc, char **argv)
     TEST("index_of: empty string", test_index_of_empty_string());
     TEST_NULL_SAFE("index_of: NULL string", test_index_of_null_string());
     TEST_NULL_SAFE("index_of: NULL value", test_index_of_null_value());
+    
+    // ─────────────────────────────────────────────────────────────────────
+    // String()->last_index_of tests
+    // ─────────────────────────────────────────────────────────────────────
+    print_suite_header("String()->last_index_of");
+    
+    TEST("last_index_of: pchar single", test_last_index_of_pchar_single());
+    TEST("last_index_of: pchar multiple", test_last_index_of_pchar_multiple());
+    TEST("last_index_of: pchar not found", test_last_index_of_pchar_not_found());
+    TEST("last_index_of: pchar at start", test_last_index_of_pchar_at_start());
+    TEST("last_index_of: pchar at end", test_last_index_of_pchar_at_end());
+    TEST("last_index_of: char single", test_last_index_of_char_single());
+    TEST("last_index_of: char multiple", test_last_index_of_char_multiple());
+    TEST("last_index_of: char not found", test_last_index_of_char_not_found());
+    TEST("last_index_of: int single", test_last_index_of_int_single());
+    TEST("last_index_of: int multiple", test_last_index_of_int_multiple());
+    TEST("last_index_of: int not found", test_last_index_of_int_not_found());
+    TEST("last_index_of: string", test_last_index_of_string());
+    TEST("last_index_of: empty string", test_last_index_of_empty_string());
+    TEST_NULL_SAFE("last_index_of: NULL string", test_last_index_of_null_string());
+    TEST_NULL_SAFE("last_index_of: NULL value", test_last_index_of_null_value());
     
     // ─────────────────────────────────────────────────────────────────────
     // Edge case tests
