@@ -141,7 +141,7 @@ void test_append_pchar(void)
 {
     string *s = String()->new("hello");
     const char *suffix = " world";
-    String()->append(s, TYPE_PCHAR, (void *)&suffix);
+    String()->append(s, VAL_PCHAR(suffix));
     ASSERT_EQ(String()->len(s), 11);
     ASSERT(equals_string(s, "hello world"));
     String()->del(&s);
@@ -151,7 +151,7 @@ void test_append_string(void)
 {
     string *s1 = String()->new("hello");
     string *s2 = String()->new(" world");
-    String()->append(s1, TYPE_STRING, s2);
+    String()->append(s1, VAL_STR(s2));
     ASSERT_EQ(String()->len(s1), 11);
     ASSERT(equals_string(s1, "hello world"));
     String()->del(&s1);
@@ -162,7 +162,7 @@ void test_append_char(void)
 {
     string *s = String()->new("hell");
     char c = 'o';
-    String()->append(s, TYPE_CHAR, &c);
+    String()->append(s, VAL_CHAR(c));
     ASSERT_EQ(String()->len(s), 5);
     ASSERT(equals_string(s, "hello"));
     String()->del(&s);
@@ -172,7 +172,7 @@ void test_append_int(void)
 {
     string *s = String()->new("num: ");
     int n = 42;
-    String()->append(s, TYPE_INT, &n);
+    String()->append(s, VAL_INT(n));
     ASSERT_EQ(String()->len(s), 7);
     ASSERT(equals_string(s, "num: 42"));
     String()->del(&s);
@@ -182,7 +182,7 @@ void test_append_int_negative(void)
 {
     string *s = String()->new("num: ");
     int n = -42;
-    String()->append(s, TYPE_INT, &n);
+    String()->append(s, VAL_INT(n));
     ASSERT_EQ(String()->len(s), 8);
     ASSERT(equals_string(s, "num: -42"));
     String()->del(&s);
@@ -192,7 +192,7 @@ void test_append_llong(void)
 {
     string *s = String()->new("big: ");
     long long n = 9223372036854775807LL;
-    String()->append(s, TYPE_LLONG, &n);
+    String()->append(s, VAL_LLONG(n));
     ASSERT_NOT_NULL(s);
     ASSERT(equals_string(s, "big: 9223372036854775807"));
     String()->del(&s);
@@ -202,7 +202,7 @@ void test_append_llong_negative(void)
 {
     string *s = String()->new("neg: ");
     long long n = -9223372036854775807LL;
-    String()->append(s, TYPE_LLONG, &n);
+    String()->append(s, VAL_LLONG(n));
     ASSERT_NOT_NULL(s);
     ASSERT(equals_string(s, "neg: -9223372036854775807"));
     String()->del(&s);
@@ -211,13 +211,13 @@ void test_append_llong_negative(void)
 void test_append_null_string(void)
 {
     const char *suffix = " world";
-    String()->append(NULL, TYPE_PCHAR, (void *)&suffix);
+    String()->append(NULL, VAL_PCHAR(suffix));
 }
 
 void test_append_null_value(void)
 {
     string *s = String()->new("hello");
-    String()->append(s, TYPE_PCHAR, NULL);
+    String()->append(s, VAL_PCHAR(NULL));
     String()->del(&s);
 }
 
@@ -225,7 +225,7 @@ void test_append_empty_pchar(void)
 {
     string *s = String()->new("hello");
     const char *empty = "";
-    String()->append(s, TYPE_PCHAR, (void *)&empty);
+    String()->append(s, VAL_PCHAR(empty));
     ASSERT_EQ(String()->len(s), 5);
     ASSERT(equals_string(s, "hello"));
     String()->del(&s);
@@ -238,9 +238,9 @@ void test_append_multiple(void)
     const char *space = " ";
     const char *world = "world";
     
-    String()->append(s, TYPE_PCHAR, (void *)&hello);
-    String()->append(s, TYPE_PCHAR, (void *)&space);
-    String()->append(s, TYPE_PCHAR, (void *)&world);
+    String()->append(s, VAL_PCHAR(hello));
+    String()->append(s, VAL_PCHAR(space));
+    String()->append(s, VAL_PCHAR(world));
     
     ASSERT_EQ(String()->len(s), 11);
     ASSERT(equals_string(s, "hello world"));
@@ -251,7 +251,7 @@ void test_append_int_zero(void)
 {
     string *s = String()->new("zero: ");
     int n = 0;
-    String()->append(s, TYPE_INT, &n);
+    String()->append(s, VAL_INT(n));
     ASSERT_EQ(String()->len(s), 7);
     ASSERT(equals_string(s, "zero: 0"));
     String()->del(&s);
@@ -329,7 +329,7 @@ void test_clone_independence(void)
     
     // Modify original
     const char *suffix = " modified";
-    String()->append(s, TYPE_PCHAR, (void *)&suffix);
+    String()->append(s, VAL_PCHAR(suffix));
     
     // Clone should remain unchanged
     ASSERT_EQ(String()->len(clone), 8);
@@ -455,7 +455,7 @@ void test_index_of_pchar_found(void)
 {
     string *s = String()->new("hello world");
     const char *needle = "world";
-    int idx = String()->index_of(s, TYPE_PCHAR, (void *)&needle);
+    int idx = String()->index_of(s, VAL_PCHAR(needle));
     ASSERT_EQ(idx, 6);
     String()->del(&s);
 }
@@ -464,7 +464,7 @@ void test_index_of_pchar_not_found(void)
 {
     string *s = String()->new("hello world");
     const char *needle = "foo";
-    int idx = String()->index_of(s, TYPE_PCHAR, (void *)&needle);
+    int idx = String()->index_of(s, VAL_PCHAR(needle));
     ASSERT_EQ(idx, -1);
     String()->del(&s);
 }
@@ -473,7 +473,7 @@ void test_index_of_pchar_at_start(void)
 {
     string *s = String()->new("hello world");
     const char *needle = "hello";
-    int idx = String()->index_of(s, TYPE_PCHAR, (void *)&needle);
+    int idx = String()->index_of(s, VAL_PCHAR(needle));
     ASSERT_EQ(idx, 0);
     String()->del(&s);
 }
@@ -482,7 +482,7 @@ void test_index_of_pchar_at_end(void)
 {
     string *s = String()->new("hello world");
     const char *needle = "ld";
-    int idx = String()->index_of(s, TYPE_PCHAR, (void *)&needle);
+    int idx = String()->index_of(s, VAL_PCHAR(needle));
     ASSERT_EQ(idx, 9);
     String()->del(&s);
 }
@@ -491,7 +491,7 @@ void test_index_of_char_found(void)
 {
     string *s = String()->new("hello world");
     char c = 'w';
-    int idx = String()->index_of(s, TYPE_CHAR, &c);
+    int idx = String()->index_of(s, VAL_CHAR(c));
     ASSERT_EQ(idx, 6);
     String()->del(&s);
 }
@@ -500,7 +500,7 @@ void test_index_of_char_not_found(void)
 {
     string *s = String()->new("hello world");
     char c = 'z';
-    int idx = String()->index_of(s, TYPE_CHAR, &c);
+    int idx = String()->index_of(s, VAL_CHAR(c));
     ASSERT_EQ(idx, -1);
     String()->del(&s);
 }
@@ -509,7 +509,7 @@ void test_index_of_char_first(void)
 {
     string *s = String()->new("hello world");
     char c = 'h';
-    int idx = String()->index_of(s, TYPE_CHAR, &c);
+    int idx = String()->index_of(s, VAL_CHAR(c));
     ASSERT_EQ(idx, 0);
     String()->del(&s);
 }
@@ -518,7 +518,7 @@ void test_index_of_int_found(void)
 {
     string *s = String()->new("value is 42 here");
     int n = 42;
-    int idx = String()->index_of(s, TYPE_INT, &n);
+    int idx = String()->index_of(s, VAL_INT(n));
     ASSERT_EQ(idx, 9);
     String()->del(&s);
 }
@@ -527,7 +527,7 @@ void test_index_of_int_not_found(void)
 {
     string *s = String()->new("value is 42 here");
     int n = 99;
-    int idx = String()->index_of(s, TYPE_INT, &n);
+    int idx = String()->index_of(s, VAL_INT(n));
     ASSERT_EQ(idx, -1);
     String()->del(&s);
 }
@@ -536,7 +536,7 @@ void test_index_of_int_negative(void)
 {
     string *s = String()->new("temp is -10 degrees");
     int n = -10;
-    int idx = String()->index_of(s, TYPE_INT, &n);
+    int idx = String()->index_of(s, VAL_INT(n));
     ASSERT_EQ(idx, 8);
     String()->del(&s);
 }
@@ -545,7 +545,7 @@ void test_index_of_string(void)
 {
     string *s = String()->new("hello world");
     string *needle = String()->new("world");
-    int idx = String()->index_of(s, TYPE_STRING, needle);
+    int idx = String()->index_of(s, VAL_STR(needle));
     ASSERT_EQ(idx, 6);
     String()->del(&s);
     String()->del(&needle);
@@ -555,7 +555,7 @@ void test_index_of_string_not_found(void)
 {
     string *s = String()->new("hello world");
     string *needle = String()->new("foo");
-    int idx = String()->index_of(s, TYPE_STRING, needle);
+    int idx = String()->index_of(s, VAL_STR(needle));
     ASSERT_EQ(idx, -1);
     String()->del(&s);
     String()->del(&needle);
@@ -565,7 +565,7 @@ void test_index_of_empty_string(void)
 {
     string *s = String()->new("");
     const char *needle = "test";
-    int idx = String()->index_of(s, TYPE_PCHAR, (void *)&needle);
+    int idx = String()->index_of(s, VAL_PCHAR(needle));
     ASSERT_EQ(idx, -1);
     String()->del(&s);
 }
@@ -573,14 +573,14 @@ void test_index_of_empty_string(void)
 void test_index_of_null_string(void)
 {
     const char *needle = "test";
-    int idx = String()->index_of(NULL, TYPE_PCHAR, (void *)&needle);
+    int idx = String()->index_of(NULL, VAL_PCHAR(needle));
     ASSERT_EQ(idx, -1);
 }
 
 void test_index_of_null_value(void)
 {
     string *s = String()->new("hello world");
-    int idx = String()->index_of(s, TYPE_PCHAR, NULL);
+    int idx = String()->index_of(s, VAL_PCHAR(NULL));
     ASSERT_EQ(idx, -1);
     String()->del(&s);
 }
@@ -593,7 +593,7 @@ void test_last_index_of_pchar_single(void)
 {
     string *s = String()->new("hello world");
     const char *needle = "world";
-    int idx = String()->last_index_of(s, TYPE_PCHAR, (void *)&needle);
+    int idx = String()->last_index_of(s, VAL_PCHAR(needle));
     ASSERT_EQ(idx, 6);
     String()->del(&s);
 }
@@ -602,7 +602,7 @@ void test_last_index_of_pchar_multiple(void)
 {
     string *s = String()->new("hello hello hello");
     const char *needle = "hello";
-    int idx = String()->last_index_of(s, TYPE_PCHAR, (void *)&needle);
+    int idx = String()->last_index_of(s, VAL_PCHAR(needle));
     ASSERT_EQ(idx, 12);  // Last "hello" starts at index 12
     String()->del(&s);
 }
@@ -611,7 +611,7 @@ void test_last_index_of_pchar_not_found(void)
 {
     string *s = String()->new("hello world");
     const char *needle = "foo";
-    int idx = String()->last_index_of(s, TYPE_PCHAR, (void *)&needle);
+    int idx = String()->last_index_of(s, VAL_PCHAR(needle));
     ASSERT_EQ(idx, -1);
     String()->del(&s);
 }
@@ -620,7 +620,7 @@ void test_last_index_of_pchar_at_start(void)
 {
     string *s = String()->new("hello");
     const char *needle = "hello";
-    int idx = String()->last_index_of(s, TYPE_PCHAR, (void *)&needle);
+    int idx = String()->last_index_of(s, VAL_PCHAR(needle));
     ASSERT_EQ(idx, 0);  // Only occurrence is at start
     String()->del(&s);
 }
@@ -629,7 +629,7 @@ void test_last_index_of_pchar_at_end(void)
 {
     string *s = String()->new("world world");
     const char *needle = "world";
-    int idx = String()->last_index_of(s, TYPE_PCHAR, (void *)&needle);
+    int idx = String()->last_index_of(s, VAL_PCHAR(needle));
     ASSERT_EQ(idx, 6);  // Last "world" at index 6
     String()->del(&s);
 }
@@ -638,7 +638,7 @@ void test_last_index_of_char_single(void)
 {
     string *s = String()->new("hello");
     char c = 'e';
-    int idx = String()->last_index_of(s, TYPE_CHAR, &c);
+    int idx = String()->last_index_of(s, VAL_CHAR(c));
     ASSERT_EQ(idx, 1);
     String()->del(&s);
 }
@@ -647,7 +647,7 @@ void test_last_index_of_char_multiple(void)
 {
     string *s = String()->new("hello world");
     char c = 'l';
-    int idx = String()->last_index_of(s, TYPE_CHAR, &c);
+    int idx = String()->last_index_of(s, VAL_CHAR(c));
     ASSERT_EQ(idx, 9);  // Last 'l' is at index 9 in "world"
     String()->del(&s);
 }
@@ -656,7 +656,7 @@ void test_last_index_of_char_not_found(void)
 {
     string *s = String()->new("hello world");
     char c = 'z';
-    int idx = String()->last_index_of(s, TYPE_CHAR, &c);
+    int idx = String()->last_index_of(s, VAL_CHAR(c));
     ASSERT_EQ(idx, -1);
     String()->del(&s);
 }
@@ -665,7 +665,7 @@ void test_last_index_of_int_single(void)
 {
     string *s = String()->new("value is 42");
     int n = 42;
-    int idx = String()->last_index_of(s, TYPE_INT, &n);
+    int idx = String()->last_index_of(s, VAL_INT(n));
     ASSERT_EQ(idx, 9);
     String()->del(&s);
 }
@@ -674,7 +674,7 @@ void test_last_index_of_int_multiple(void)
 {
     string *s = String()->new("42 plus 42 equals 84");
     int n = 42;
-    int idx = String()->last_index_of(s, TYPE_INT, &n);
+    int idx = String()->last_index_of(s, VAL_INT(n));
     ASSERT_EQ(idx, 8);  // Last "42" at index 8
     String()->del(&s);
 }
@@ -683,7 +683,7 @@ void test_last_index_of_int_not_found(void)
 {
     string *s = String()->new("value is 42");
     int n = 99;
-    int idx = String()->last_index_of(s, TYPE_INT, &n);
+    int idx = String()->last_index_of(s, VAL_INT(n));
     ASSERT_EQ(idx, -1);
     String()->del(&s);
 }
@@ -692,7 +692,7 @@ void test_last_index_of_string(void)
 {
     string *s = String()->new("test test test");
     string *needle = String()->new("test");
-    int idx = String()->last_index_of(s, TYPE_STRING, needle);
+    int idx = String()->last_index_of(s, VAL_STR(needle));
     ASSERT_EQ(idx, 10);  // Last "test" at index 10
     String()->del(&s);
     String()->del(&needle);
@@ -702,7 +702,7 @@ void test_last_index_of_empty_string(void)
 {
     string *s = String()->new("");
     const char *needle = "test";
-    int idx = String()->last_index_of(s, TYPE_PCHAR, (void *)&needle);
+    int idx = String()->last_index_of(s, VAL_PCHAR(needle));
     ASSERT_EQ(idx, -1);
     String()->del(&s);
 }
@@ -710,14 +710,14 @@ void test_last_index_of_empty_string(void)
 void test_last_index_of_null_string(void)
 {
     const char *needle = "test";
-    int idx = String()->last_index_of(NULL, TYPE_PCHAR, (void *)&needle);
+    int idx = String()->last_index_of(NULL, VAL_PCHAR(needle));
     ASSERT_EQ(idx, -1);
 }
 
 void test_last_index_of_null_value(void)
 {
     string *s = String()->new("hello world");
-    int idx = String()->last_index_of(s, TYPE_PCHAR, NULL);
+    int idx = String()->last_index_of(s, VAL_PCHAR(NULL));
     ASSERT_EQ(idx, -1);
     String()->del(&s);
 }
@@ -735,7 +735,7 @@ void test_large_append(void)
     const char *chunk_ptr = chunk;
     
     for (int i = 0; i < 100; i++)
-        String()->append(s, TYPE_PCHAR, (void *)&chunk_ptr);
+        String()->append(s, VAL_PCHAR(chunk_ptr));
     
     ASSERT_EQ(String()->len(s), 10000);
     String()->del(&s);
@@ -745,7 +745,7 @@ void test_int_min_value(void)
 {
     string *s = String()->new("");
     int n = -2147483648;  // INT_MIN
-    String()->append(s, TYPE_INT, &n);
+    String()->append(s, VAL_INT(n));
     ASSERT_NOT_NULL(s);
     String()->del(&s);
 }
@@ -754,7 +754,7 @@ void test_int_max_value(void)
 {
     string *s = String()->new("");
     int n = 2147483647;  // INT_MAX
-    String()->append(s, TYPE_INT, &n);
+    String()->append(s, VAL_INT(n));
     ASSERT_NOT_NULL(s);
     String()->del(&s);
 }

@@ -233,28 +233,27 @@ void  append_llong_to_string(string *str, long long l)
 
 /// @brief Appends the given value argument into the string.
 /// @param str 
-/// @param type 
-/// @param value
-void  append_to_string(string *str, append_type type, void *value)
+/// @param val typed_value containing type and value
+void  append_to_string(string *str, typed_value val)
 {
-  if (!str || !value)
+  if (!str)
     return ;
-  switch (type)
+  switch (val.type)
   {
     case TYPE_STRING:
-      append_str_to_string(str, (string *)value);
+      append_str_to_string(str, val.as_str);
       break ;
     case TYPE_PCHAR:
-      append_pchar_to_string(str, *(const char **)value);
+      append_pchar_to_string(str, val.as_pchar);
       break ;
     case TYPE_CHAR:
-      append_char_to_string(str, *(char *)value);
+      append_char_to_string(str, val.as_char);
       break ;
     case TYPE_INT:
-      append_int_to_string(str, *(int *)value);
+      append_int_to_string(str, val.as_int);
       break ;
     case TYPE_LLONG:
-      append_llong_to_string(str, *(long long *)value);
+      append_llong_to_string(str, val.as_llong);
       break ;
     default:
         break ;
@@ -399,39 +398,43 @@ int find_string(char *str, char *to_find, int search_order)
   }
 }
 
-char  *convert_types_to_pchar(const string *str, append_type type, void *value)
+char  *convert_types_to_pchar(const string *str, typed_value val)
 {
   char  *ptr;
 
-  if (!str || !str->s || !value)
+  if (!str || !str->s)
     return (NULL);
-  switch (type)
+  switch (val.type)
   {
     case TYPE_STRING:
-      ptr = calloc(((string *)value)->capacity, sizeof(char));
+      if (!val.as_str)
+        return (NULL);
+      ptr = calloc(val.as_str->capacity, sizeof(char));
       if (!ptr)
         return (NULL);
-      memorycopy(ptr, ((string *)value)->s, ((string *)value)->capacity);
+      memorycopy(ptr, val.as_str->s, val.as_str->capacity);
       break ;
     case TYPE_PCHAR:
-      ptr = calloc(stringlen(*(char **)value) + 1, sizeof(char));
+      if (!val.as_pchar)
+        return (NULL);
+      ptr = calloc(stringlen((char *)val.as_pchar) + 1, sizeof(char));
       if (!ptr)
         return (NULL);
-      memorycopy(ptr, *(char **)value, stringlen(*(char **)value));
+      memorycopy(ptr, (void *)val.as_pchar, stringlen((char *)val.as_pchar));
       break ;
     case TYPE_CHAR:
       ptr = calloc(2, sizeof(char));
       if (!ptr)
         return (NULL);
-      *ptr = *(char *)value;
+      *ptr = val.as_char;
       break ;
     case TYPE_INT:
-      ptr = int_to_ascii(*(int *)value);
+      ptr = int_to_ascii(val.as_int);
       if (!ptr)
         return (NULL);
       break ;
     case TYPE_LLONG:
-      ptr = llong_to_ascii(*(long *)value);
+      ptr = llong_to_ascii(val.as_llong);
       if (!ptr)
         return (NULL);
       break ;
@@ -443,35 +446,37 @@ char  *convert_types_to_pchar(const string *str, append_type type, void *value)
 
 /// @brief Returns the index of the first match of the given value argument.
 /// @param str 
-/// @param type 
-/// @param value 
+/// @param val typed_value containing type and value
 /// @return integer
-int  index_of_element(const string *str, append_type type, void *value)
+int  index_of_element(const string *str, typed_value val)
 {
   char  *ptr;
   int   index;
 
-  if (!str || !str->s || !value)
+  if (!str || !str->s)
     return (-1);
-  ptr = convert_types_to_pchar(str, type, value);
+  ptr = convert_types_to_pchar(str, val);
+  if (!ptr)
+    return (-1);
   index = find_string(str->s, ptr, 1);
   free(ptr);
   return (index);
 }
 
-/// @brief Returns the index of the first match of the given value argument.
+/// @brief Returns the index of the last match of the given value argument.
 /// @param str 
-/// @param type 
-/// @param value 
+/// @param val typed_value containing type and value
 /// @return integer
-int  last_index_of_element(const string *str, append_type type, void *value)
+int  last_index_of_element(const string *str, typed_value val)
 {
   char  *ptr;
   int   index;
 
-  if (!str || !str->s || !value)
+  if (!str || !str->s)
     return (-1);
-  ptr = convert_types_to_pchar(str, type, value);
+  ptr = convert_types_to_pchar(str, val);
+  if (!ptr)
+    return (-1);
   index = find_string(str->s, ptr, -1);
   free(ptr);
   return (index);

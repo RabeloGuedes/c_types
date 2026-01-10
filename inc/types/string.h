@@ -2,6 +2,9 @@
 # define TYPES_STRING_H
 
 # include <types/utils.h>
+
+typedef struct string string;
+
 typedef enum {
     TYPE_STRING,
     TYPE_PCHAR,
@@ -10,19 +13,37 @@ typedef enum {
     TYPE_LLONG
 }   append_type;
 
-typedef struct string string;
+// Tagged union - bundles type and value together (type-safe)
+typedef struct {
+    append_type type;
+    union {
+        int         as_int;
+        char        as_char;
+        long long   as_llong;
+        const char  *as_pchar;
+        string      *as_str;
+    };
+}   typed_value;
+
+// Helper macros - user can ONLY create valid type+value combinations
+# define VAL_INT(n)    ((typed_value){TYPE_INT,    {.as_int = (n)}})
+# define VAL_CHAR(c)   ((typed_value){TYPE_CHAR,   {.as_char = (c)}})
+# define VAL_LLONG(l)  ((typed_value){TYPE_LLONG,  {.as_llong = (l)}})
+# define VAL_PCHAR(s)  ((typed_value){TYPE_PCHAR,  {.as_pchar = (s)}})
+# define VAL_STR(s)    ((typed_value){TYPE_STRING, {.as_str = (s)}})
+
 typedef struct string_metohods 
 {
     string  *(*new)(char *);
     ui64    (*len)(const string *);
     void    (*write)(int, const string *);
     void    (*del)(string **);
-    void    (*append)(string *, append_type, void *);
+    void    (*append)(string *, typed_value);
     string  *(*clone)(string *);
     void    (*to_lower)(string *);
     void    (*to_upper)(string *);
-    int     (*index_of)(const string *, append_type, void *);
-    int     (*last_index_of)(const string *, append_type, void *);
+    int     (*index_of)(const string *, typed_value);
+    int     (*last_index_of)(const string *, typed_value);
 }   str_funcs;
 
 
