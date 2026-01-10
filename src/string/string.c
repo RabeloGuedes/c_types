@@ -350,30 +350,95 @@ void  upper_string(string *str)
 }
 
 /// @brief This function searches for a string inside another one and returns
-/// the position where it starts in the searched string.
+/// the position where it starts in the searched string, if the search_oder
+/// is negative it searches the last index of the given element.
 /// @param str 
 /// @param to_find 
 /// @return 
-int find_string(char *str, char *to_find)
+int find_string(char *str, char *to_find, int search_order)
 {
   int i;
   int j;
+  int k;
 
   if (!str || !to_find)
     return (-1);
-  i = 0;
-  while (str[i])
+  if (search_order >= 0)
   {
-    j = 0;
-    while (str[i + j] && to_find[j] && str[i + j] == to_find[j])
+  i = 0;
+    while (str[i])
     {
-      if (!to_find[j + 1])
-        return (i);
-      j++;
+      j = 0;
+      while (str[i + j] && to_find[j] && str[i + j] == to_find[j])
+      {
+        if (!to_find[j + 1])
+          return (i);
+        j++;
+      }
+      i++;
     }
-    i++;
+    return (-1);
   }
-  return (-1);
+  else
+  {
+    i = stringlen(str) - 1;
+    while (i > 0)
+    {
+      j = stringlen(to_find) - 1;
+      k = 0;
+      while (i + k >= 0 && j >= 0 && str[i + k] == to_find[j])
+      {
+        if (!j)
+          return (i + k);
+        j--;
+        k--;
+      }
+      i--;
+    }
+    return (-1);
+  }
+}
+
+char  *convert_types_to_pchar(const string *str, append_type type, void *value)
+{
+  char  *ptr;
+
+  if (!str || !str->s || !value)
+    return (NULL);
+  switch (type)
+  {
+    case TYPE_STRING:
+      ptr = calloc(((string *)value)->capacity, sizeof(char));
+      if (!ptr)
+        return (NULL);
+      memorycopy(ptr, ((string *)value)->s, ((string *)value)->capacity);
+      break ;
+    case TYPE_PCHAR:
+      ptr = calloc(stringlen(*(char **)value) + 1, sizeof(char));
+      if (!ptr)
+        return (NULL);
+      memorycopy(ptr, *(char **)value, stringlen(*(char **)value));
+      break ;
+    case TYPE_CHAR:
+      ptr = calloc(2, sizeof(char));
+      if (!ptr)
+        return (NULL);
+      *ptr = *(char *)value;
+      break ;
+    case TYPE_INT:
+      ptr = int_to_ascii(*(int *)value);
+      if (!ptr)
+        return (NULL);
+      break ;
+    case TYPE_LLONG:
+      ptr = llong_to_ascii(*(long *)value);
+      if (!ptr)
+        return (NULL);
+      break ;
+    default:
+      return (NULL);
+  }
+  return (ptr);
 }
 
 /// @brief Returns the index of the first match of the given value argument.
@@ -388,40 +453,26 @@ int  index_of_element(const string *str, append_type type, void *value)
 
   if (!str || !str->s || !value)
     return (-1);
-  switch (type)
-  {
-    case TYPE_STRING:
-      ptr = calloc(((string *)value)->capacity, sizeof(char));
-      if (!ptr)
-        return (-1);
-      memorycopy(ptr, ((string *)value)->s, ((string *)value)->capacity);
-      break ;
-    case TYPE_PCHAR:
-      ptr = calloc(stringlen(*(char **)value) + 1, sizeof(char));
-      if (!ptr)
-        return (-1);
-      memorycopy(ptr, *(char **)value, stringlen(*(char **)value));
-      break ;
-    case TYPE_CHAR:
-      ptr = calloc(2, sizeof(char));
-      if (!ptr)
-        return (-1);
-      *ptr = *(char *)value;
-      break ;
-    case TYPE_INT:
-      ptr = int_to_ascii(*(int *)value);
-      if (!ptr)
-        return (-1);
-      break ;
-    case TYPE_LLONG:
-      ptr = llong_to_ascii(*(long *)value);
-      if (!ptr)
-        return (-1);
-      break ;
-    default:
-      return (-1);
-  }
-  index = find_string(str->s, ptr);
+  ptr = convert_types_to_pchar(str, type, value);
+  index = find_string(str->s, ptr, 1);
+  free(ptr);
+  return (index);
+}
+
+/// @brief Returns the index of the first match of the given value argument.
+/// @param str 
+/// @param type 
+/// @param value 
+/// @return integer
+int  last_index_of_element(const string *str, append_type type, void *value)
+{
+  char  *ptr;
+  int   index;
+
+  if (!str || !str->s || !value)
+    return (-1);
+  ptr = convert_types_to_pchar(str, type, value);
+  index = find_string(str->s, ptr, -1);
   free(ptr);
   return (index);
 }
@@ -443,5 +494,6 @@ str_funcs   *String(void)
   string_functions.to_lower = &lower_string;
   string_functions.to_upper = &upper_string;
   string_functions.index_of = &index_of_element;
+  string_functions.last_index_of = &last_index_of_element;
   return (&string_functions);
 }
