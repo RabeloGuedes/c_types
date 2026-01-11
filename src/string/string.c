@@ -713,6 +713,16 @@ int is_string_title(const string *str)
   return (1);
 }
 
+/// @brief Verifies if the string is empty.
+/// @param str 
+/// @return 1 or 0
+int is_string_empty(const string *str)
+{
+  if (!str || !str->s)
+    return (0);
+  return (!str->len);
+}
+
 /// @brief This function returns a struct with all functions that
 /// can be used with the string type.
 /// @param  
@@ -742,5 +752,6 @@ str_funcs   *String(void)
   string_functions.is_printable = &is_string_printable;
   string_functions.is_space = &is_string_whitespaces;
   string_functions.is_title = &is_string_title;
+  string_functions.is_empty = &is_string_empty;
   return (&string_functions);
 }
