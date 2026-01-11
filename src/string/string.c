@@ -16,7 +16,6 @@ string  *new_string(char *s)
   str = calloc(1, sizeof(string));
   if (!str)
     return (NULL);
-
   str->len = stringlen(s);
   str->capacity = str->len;
   str->s = calloc(1, str->len + 1);
@@ -868,6 +867,77 @@ void  capitalize_string(string *str)
   }
 }
 
+/// @brief This function creates a subtring of the given string.
+/// @param str 
+/// @param start 
+/// @param end 
+/// @return string
+string  *substring(const string *str, ui64 start, ui64 end)
+{
+  string  *p;
+  char    *ptr;
+  char    *s;
+  ui64    len;
+
+  if (!str || !str->s || start >= end)
+    return (NULL);
+  p = new_string("");
+  if (!p)
+    return (NULL);
+  ptr = calloc(end - start + 1, sizeof(char));
+  if (!ptr)
+  {
+    dealloc_string(&p);
+    return (NULL);
+  }
+  s = str->s;
+  len = str->len;
+  while (start <= end && start < len)
+  {
+    ptr[start] = s[start];
+    start++;
+  }
+  free(p->s);
+  p->s = ptr;
+  p->len = stringlen(ptr);
+  p->capacity = len + 1;
+  return (p);
+}
+
+/// @brief This function trims the string.
+/// @param str 
+void  trim_string(string *str)
+{
+  char  *ptr;
+  ui64  start;
+  ui64  end;
+  ui64  len;
+
+  if (!str || !str->s)
+    return ;
+  len = str->len;
+  end = str->len;
+  ptr = str->s;
+  while (len-- && ((ptr[start] >= '\t' && ptr[start] <= '\r') || ptr[start] = ' '))
+    start;
+  if (start == end)
+    return ;
+  while (end-- && ((ptr[end] >= '\t' && ptr[end] <= '\r') || ptr[end] = ' '))
+    ;
+  ptr = calloc(end - start + 1, sizeof(char));
+  if (!ptr)
+    return ;
+  while (start <= end)
+  {
+    ptr[start] = str->s[start];
+    start++;
+  }
+  free(str->s);
+  str->s = ptr;
+  str->len = stringlen(ptr);
+  str->capacity = str->len + 1;
+}
+
 /// @brief This function returns a struct with all functions that
 /// can be used with the string type.
 /// @param  
@@ -903,5 +973,7 @@ str_funcs   *String(void)
   string_functions.change = &change_string;
   string_functions.compare = &compare_strings;
   string_functions.capitalize = &capitalize_string;
+  string_functions.substring = &substring;
+  string_functions.trim = &trim_string;
   return (&string_functions);
 }

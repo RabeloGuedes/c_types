@@ -61,6 +61,8 @@ typedef struct string_metohods
     int     (*change)(string *, char *);
     int     (*compare)(const string *, typed_value);
     void    (*capitalize)(string *);
+    string  *(*substring)(const string *, ui64, ui64);
+    void    (*trim)(string *);
 }   str_funcs;
 
 
