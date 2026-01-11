@@ -936,6 +936,227 @@ void test_is_ascii_null(void)
 }
 
 // ============================================================================
+// Test Functions for String()->is_lower
+// ============================================================================
+
+void test_is_lower_all_lower(void)
+{
+    string *s = String()->new("hello");
+    ASSERT_EQ(String()->is_lower(s), 1);
+    String()->del(&s);
+}
+
+void test_is_lower_with_upper(void)
+{
+    string *s = String()->new("Hello");
+    ASSERT_EQ(String()->is_lower(s), 0);
+    String()->del(&s);
+}
+
+void test_is_lower_all_upper(void)
+{
+    string *s = String()->new("HELLO");
+    ASSERT_EQ(String()->is_lower(s), 0);
+    String()->del(&s);
+}
+
+void test_is_lower_with_numbers(void)
+{
+    string *s = String()->new("hello123");
+    ASSERT_EQ(String()->is_lower(s), 0);
+    String()->del(&s);
+}
+
+void test_is_lower_with_space(void)
+{
+    string *s = String()->new("hello world");
+    ASSERT_EQ(String()->is_lower(s), 0);
+    String()->del(&s);
+}
+
+void test_is_lower_with_symbols(void)
+{
+    string *s = String()->new("hello!");
+    ASSERT_EQ(String()->is_lower(s), 0);
+    String()->del(&s);
+}
+
+void test_is_lower_empty(void)
+{
+    string *s = String()->new("");
+    int result = String()->is_lower(s);
+    ASSERT(result == 0 || result == 1);
+    String()->del(&s);
+}
+
+void test_is_lower_null(void)
+{
+    ASSERT_EQ(String()->is_lower(NULL), 0);
+}
+
+// ============================================================================
+// Test Functions for String()->is_upper
+// ============================================================================
+
+void test_is_upper_all_upper(void)
+{
+    string *s = String()->new("HELLO");
+    ASSERT_EQ(String()->is_upper(s), 1);
+    String()->del(&s);
+}
+
+void test_is_upper_with_lower(void)
+{
+    string *s = String()->new("HELLo");
+    ASSERT_EQ(String()->is_upper(s), 0);
+    String()->del(&s);
+}
+
+void test_is_upper_all_lower(void)
+{
+    string *s = String()->new("hello");
+    ASSERT_EQ(String()->is_upper(s), 0);
+    String()->del(&s);
+}
+
+void test_is_upper_with_numbers(void)
+{
+    string *s = String()->new("HELLO123");
+    ASSERT_EQ(String()->is_upper(s), 0);
+    String()->del(&s);
+}
+
+void test_is_upper_with_space(void)
+{
+    string *s = String()->new("HELLO WORLD");
+    ASSERT_EQ(String()->is_upper(s), 0);
+    String()->del(&s);
+}
+
+void test_is_upper_with_symbols(void)
+{
+    string *s = String()->new("HELLO!");
+    ASSERT_EQ(String()->is_upper(s), 0);
+    String()->del(&s);
+}
+
+void test_is_upper_empty(void)
+{
+    string *s = String()->new("");
+    int result = String()->is_upper(s);
+    ASSERT(result == 0 || result == 1);
+    String()->del(&s);
+}
+
+void test_is_upper_null(void)
+{
+    ASSERT_EQ(String()->is_upper(NULL), 0);
+}
+
+// ============================================================================
+// Test Functions for String()->is_printable
+// ============================================================================
+
+void test_is_printable_basic(void)
+{
+    string *s = String()->new("Hello, World!");
+    ASSERT_EQ(String()->is_printable(s), 1);
+    String()->del(&s);
+}
+
+void test_is_printable_all_printable(void)
+{
+    string *s = String()->new("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789");
+    ASSERT_EQ(String()->is_printable(s), 1);
+    String()->del(&s);
+}
+
+void test_is_printable_special_chars(void)
+{
+    string *s = String()->new("!@#$%^&*()_+-=[]{}|;':\",./<>?");
+    ASSERT_EQ(String()->is_printable(s), 1);
+    String()->del(&s);
+}
+
+void test_is_printable_with_space(void)
+{
+    string *s = String()->new("hello world");
+    ASSERT_EQ(String()->is_printable(s), 1);
+    String()->del(&s);
+}
+
+void test_is_printable_with_tab(void)
+{
+    string *s = String()->new("hello\tworld");
+    ASSERT_EQ(String()->is_printable(s), 1);
+    String()->del(&s);
+}
+
+void test_is_printable_with_newline(void)
+{
+    string *s = String()->new("hello\nworld");
+    ASSERT_EQ(String()->is_printable(s), 1);
+    String()->del(&s);
+}
+
+void test_is_printable_with_carriage_return(void)
+{
+    string *s = String()->new("hello\rworld");
+    ASSERT_EQ(String()->is_printable(s), 1);
+    String()->del(&s);
+}
+
+void test_is_printable_with_null_char(void)
+{
+    // String with embedded NUL (only first part will be stored)
+    char str[] = "hello\0world";
+    string *s = String()->new(str);
+    // Should be printable since the string stops at \0
+    ASSERT_EQ(String()->is_printable(s), 1);
+    String()->del(&s);
+}
+
+void test_is_printable_with_bell(void)
+{
+    // Bell character (0x07) is not printable
+    char str[] = "hello\x07world";
+    string *s = String()->new(str);
+    ASSERT_EQ(String()->is_printable(s), 0);
+    String()->del(&s);
+}
+
+void test_is_printable_with_escape(void)
+{
+    // Escape character (0x1B) is not printable
+    char str[] = "hello\x1Bworld";
+    string *s = String()->new(str);
+    ASSERT_EQ(String()->is_printable(s), 0);
+    String()->del(&s);
+}
+
+void test_is_printable_with_del(void)
+{
+    // DEL character (0x7F) is not printable
+    char str[] = "hello\x7Fworld";
+    string *s = String()->new(str);
+    ASSERT_EQ(String()->is_printable(s), 0);
+    String()->del(&s);
+}
+
+void test_is_printable_empty(void)
+{
+    string *s = String()->new("");
+    int result = String()->is_printable(s);
+    ASSERT(result == 0 || result == 1);
+    String()->del(&s);
+}
+
+void test_is_printable_null(void)
+{
+    ASSERT_EQ(String()->is_printable(NULL), 0);
+}
+
+// ============================================================================
 // Edge Cases
 // ============================================================================
 
@@ -1174,6 +1395,53 @@ int main(int argc, char **argv)
     TEST("is_ascii: with utf8", test_is_ascii_with_utf8());
     TEST("is_ascii: empty string", test_is_ascii_empty());
     TEST_NULL_SAFE("is_ascii: NULL input", test_is_ascii_null());
+    
+    // ─────────────────────────────────────────────────────────────────────
+    // String()->is_lower tests
+    // ─────────────────────────────────────────────────────────────────────
+    print_suite_header("String()->is_lower");
+    
+    TEST("is_lower: all lower", test_is_lower_all_lower());
+    TEST("is_lower: with upper", test_is_lower_with_upper());
+    TEST("is_lower: all upper", test_is_lower_all_upper());
+    TEST("is_lower: with numbers", test_is_lower_with_numbers());
+    TEST("is_lower: with space", test_is_lower_with_space());
+    TEST("is_lower: with symbols", test_is_lower_with_symbols());
+    TEST("is_lower: empty string", test_is_lower_empty());
+    TEST_NULL_SAFE("is_lower: NULL input", test_is_lower_null());
+    
+    // ─────────────────────────────────────────────────────────────────────
+    // String()->is_upper tests
+    // ─────────────────────────────────────────────────────────────────────
+    print_suite_header("String()->is_upper");
+    
+    TEST("is_upper: all upper", test_is_upper_all_upper());
+    TEST("is_upper: with lower", test_is_upper_with_lower());
+    TEST("is_upper: all lower", test_is_upper_all_lower());
+    TEST("is_upper: with numbers", test_is_upper_with_numbers());
+    TEST("is_upper: with space", test_is_upper_with_space());
+    TEST("is_upper: with symbols", test_is_upper_with_symbols());
+    TEST("is_upper: empty string", test_is_upper_empty());
+    TEST_NULL_SAFE("is_upper: NULL input", test_is_upper_null());
+    
+    // ─────────────────────────────────────────────────────────────────────
+    // String()->is_printable tests
+    // ─────────────────────────────────────────────────────────────────────
+    print_suite_header("String()->is_printable");
+    
+    TEST("is_printable: basic", test_is_printable_basic());
+    TEST("is_printable: all printable", test_is_printable_all_printable());
+    TEST("is_printable: special chars", test_is_printable_special_chars());
+    TEST("is_printable: with space", test_is_printable_with_space());
+    TEST("is_printable: with tab", test_is_printable_with_tab());
+    TEST("is_printable: with newline", test_is_printable_with_newline());
+    TEST("is_printable: with carriage return", test_is_printable_with_carriage_return());
+    TEST("is_printable: with null char", test_is_printable_with_null_char());
+    TEST("is_printable: with bell", test_is_printable_with_bell());
+    TEST("is_printable: with escape", test_is_printable_with_escape());
+    TEST("is_printable: with DEL", test_is_printable_with_del());
+    TEST("is_printable: empty string", test_is_printable_empty());
+    TEST_NULL_SAFE("is_printable: NULL input", test_is_printable_null());
     
     // ─────────────────────────────────────────────────────────────────────
     // Edge case tests
