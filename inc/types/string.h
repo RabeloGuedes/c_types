@@ -60,6 +60,7 @@ typedef struct string_metohods
     int     (*count)(const string *, typed_value);
     int     (*change)(string *, char *);
     int     (*compare)(const string *, typed_value);
+    void    (*capitalize)(string *);
 }   str_funcs;
 
 

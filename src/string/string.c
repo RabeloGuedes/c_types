@@ -837,6 +837,37 @@ int compare_strings(const string *str, typed_value to_compare)
   return (1);
 }
 
+/// @brief This function performs a transformation in the string
+/// by capitalize the string.
+/// @param str 
+void  capitalize_string(string *str)
+{
+  char  *ptr;
+  ui64  len;
+  char  was_separator;
+
+  was_separator = 1;
+  if (!str || !str->s)
+    return ;
+  len = str->len;
+  ptr = str->s;
+  while (len--)
+  {
+    if (!was_separator && *ptr >= 'A' && *ptr <= 'Z')
+      *ptr += ('a' - 'A');
+    else if (was_separator && *ptr >= 'a' && *ptr <= 'z')
+      *ptr -= 'a' - 'A';
+    if ((*ptr >= '0' && *ptr <= '9')
+      || (*ptr >= ',' && *ptr <= '/')
+      || (*ptr >= '\t' && *ptr <= '\r')
+      || *ptr == ' ')
+      was_separator = 1;
+    else
+      was_separator = 0;
+    ptr++;
+  }
+}
+
 /// @brief This function returns a struct with all functions that
 /// can be used with the string type.
 /// @param  
@@ -871,5 +902,6 @@ str_funcs   *String(void)
   string_functions.swap_case = &swap_string_case;
   string_functions.change = &change_string;
   string_functions.compare = &compare_strings;
+  string_functions.capitalize = &capitalize_string;
   return (&string_functions);
 }
