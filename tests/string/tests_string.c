@@ -1359,6 +1359,57 @@ void test_is_space_null(void)
 }
 
 // ============================================================================
+// Test Functions for String()->is_empty
+// ============================================================================
+
+void test_is_empty_empty_string(void)
+{
+    string *s = String()->new("");
+    ASSERT_EQ(String()->is_empty(s), 1);
+    String()->del(&s);
+}
+
+void test_is_empty_non_empty(void)
+{
+    string *s = String()->new("hello");
+    ASSERT_EQ(String()->is_empty(s), 0);
+    String()->del(&s);
+}
+
+void test_is_empty_single_char(void)
+{
+    string *s = String()->new("a");
+    ASSERT_EQ(String()->is_empty(s), 0);
+    String()->del(&s);
+}
+
+void test_is_empty_single_space(void)
+{
+    string *s = String()->new(" ");
+    ASSERT_EQ(String()->is_empty(s), 0);
+    String()->del(&s);
+}
+
+void test_is_empty_whitespace(void)
+{
+    string *s = String()->new("   \t\n");
+    ASSERT_EQ(String()->is_empty(s), 0);
+    String()->del(&s);
+}
+
+void test_is_empty_long_string(void)
+{
+    string *s = String()->new("this is a longer string");
+    ASSERT_EQ(String()->is_empty(s), 0);
+    String()->del(&s);
+}
+
+void test_is_empty_null(void)
+{
+    ASSERT_EQ(String()->is_empty(NULL), 0);
+}
+
+// ============================================================================
 // Edge Cases
 // ============================================================================
 
@@ -1683,6 +1734,19 @@ int main(int argc, char **argv)
     TEST("is_space: single space", test_is_space_single_space());
     TEST("is_space: empty string", test_is_space_empty());
     TEST_NULL_SAFE("is_space: NULL input", test_is_space_null());
+    
+    // ─────────────────────────────────────────────────────────────────────
+    // String()->is_empty tests
+    // ─────────────────────────────────────────────────────────────────────
+    print_suite_header("String()->is_empty");
+    
+    TEST("is_empty: empty string", test_is_empty_empty_string());
+    TEST("is_empty: non-empty", test_is_empty_non_empty());
+    TEST("is_empty: single char", test_is_empty_single_char());
+    TEST("is_empty: single space", test_is_empty_single_space());
+    TEST("is_empty: whitespace", test_is_empty_whitespace());
+    TEST("is_empty: long string", test_is_empty_long_string());
+    TEST_NULL_SAFE("is_empty: NULL input", test_is_empty_null());
     
     // ─────────────────────────────────────────────────────────────────────
     // Edge case tests
