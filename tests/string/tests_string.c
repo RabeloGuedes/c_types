@@ -1773,6 +1773,104 @@ void test_compare_null_value(void)
 }
 
 // ============================================================================
+// Test Functions for String()->capitalize
+// ============================================================================
+
+void test_capitalize_basic(void)
+{
+    string *s = String()->new("hello world");
+    String()->capitalize(s);
+    ASSERT(equals_string(s, "Hello World"));
+    String()->del(&s);
+}
+
+void test_capitalize_all_lower(void)
+{
+    string *s = String()->new("hello");
+    String()->capitalize(s);
+    ASSERT(equals_string(s, "Hello"));
+    String()->del(&s);
+}
+
+void test_capitalize_all_upper(void)
+{
+    string *s = String()->new("HELLO WORLD");
+    String()->capitalize(s);
+    ASSERT(equals_string(s, "Hello World"));
+    String()->del(&s);
+}
+
+void test_capitalize_mixed_case(void)
+{
+    string *s = String()->new("hELLO wORLD");
+    String()->capitalize(s);
+    ASSERT(equals_string(s, "Hello World"));
+    String()->del(&s);
+}
+
+void test_capitalize_already_capitalized(void)
+{
+    string *s = String()->new("Hello World");
+    String()->capitalize(s);
+    ASSERT(equals_string(s, "Hello World"));
+    String()->del(&s);
+}
+
+void test_capitalize_with_numbers(void)
+{
+    string *s = String()->new("hello2world");
+    String()->capitalize(s);
+    // Numbers act as separators
+    ASSERT(equals_string(s, "Hello2World"));
+    String()->del(&s);
+}
+
+void test_capitalize_with_comma(void)
+{
+    string *s = String()->new("hello,world");
+    String()->capitalize(s);
+    ASSERT(equals_string(s, "Hello,World"));
+    String()->del(&s);
+}
+
+void test_capitalize_with_period(void)
+{
+    string *s = String()->new("hello.world");
+    String()->capitalize(s);
+    ASSERT(equals_string(s, "Hello.World"));
+    String()->del(&s);
+}
+
+void test_capitalize_with_tab(void)
+{
+    string *s = String()->new("hello\tworld");
+    String()->capitalize(s);
+    ASSERT(equals_string(s, "Hello\tWorld"));
+    String()->del(&s);
+}
+
+void test_capitalize_single_char(void)
+{
+    string *s = String()->new("a");
+    String()->capitalize(s);
+    ASSERT(equals_string(s, "A"));
+    String()->del(&s);
+}
+
+void test_capitalize_empty(void)
+{
+    string *s = String()->new("");
+    String()->capitalize(s);
+    ASSERT_EQ(String()->len(s), 0);
+    String()->del(&s);
+}
+
+void test_capitalize_null(void)
+{
+    String()->capitalize(NULL);
+}
+
+// ============================================================================
 // Edge Cases
 // ============================================================================
 
@@ -2180,6 +2278,24 @@ int main(int argc, char **argv)
     TEST("compare: string type", test_compare_string_type());
     TEST_NULL_SAFE("compare: NULL string", test_compare_null_string());
     TEST_NULL_SAFE("compare: NULL value", test_compare_null_value());
+    
+    // ─────────────────────────────────────────────────────────────────────
+    // String()->capitalize tests
+    // ─────────────────────────────────────────────────────────────────────
+    print_suite_header("String()->capitalize");
+    
+    TEST("capitalize: basic", test_capitalize_basic());
+    TEST("capitalize: all lower", test_capitalize_all_lower());
+    TEST("capitalize: all upper", test_capitalize_all_upper());
+    TEST("capitalize: mixed case", test_capitalize_mixed_case());
+    TEST("capitalize: already capitalized", test_capitalize_already_capitalized());
+    TEST("capitalize: with numbers", test_capitalize_with_numbers());
+    TEST("capitalize: with comma", test_capitalize_with_comma());
+    TEST("capitalize: with period", test_capitalize_with_period());
+    TEST("capitalize: with tab", test_capitalize_with_tab());
+    TEST("capitalize: single char", test_capitalize_single_char());
+    TEST("capitalize: empty string", test_capitalize_empty());
+    TEST_NULL_SAFE("capitalize: NULL input", test_capitalize_null());
     
     // ─────────────────────────────────────────────────────────────────────
     // Edge case tests
