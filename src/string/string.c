@@ -398,12 +398,10 @@ int find_string(char *str, char *to_find, int search_order)
   }
 }
 
-char  *convert_types_to_pchar(const string *str, typed_value val)
+char  *convert_types_to_pchar(typed_value val)
 {
   char  *ptr;
 
-  if (!str || !str->s)
-    return (NULL);
   switch (val.type)
   {
     case TYPE_STRING:
@@ -455,7 +453,7 @@ int  index_of_element(const string *str, typed_value val)
 
   if (!str || !str->s)
     return (-1);
-  ptr = convert_types_to_pchar(str, val);
+  ptr = convert_types_to_pchar(val);
   if (!ptr)
     return (-1);
   index = find_string(str->s, ptr, 1);
@@ -474,7 +472,7 @@ int  last_index_of_element(const string *str, typed_value val)
 
   if (!str || !str->s)
     return (-1);
-  ptr = convert_types_to_pchar(str, val);
+  ptr = convert_types_to_pchar(val);
   if (!ptr)
     return (-1);
   index = find_string(str->s, ptr, -1);
@@ -738,7 +736,7 @@ int  count_in_string(const string *str, typed_value t)
   pos = 0;
   if (!str || !str->s)
     return (0);
-  ptr = convert_types_to_pchar(str, t);
+  ptr = convert_types_to_pchar(t);
   if (!ptr)
     return (-1);
   s = str->s;
@@ -807,6 +805,32 @@ int  change_string(string *str, char *s)
   return (1);
 }
 
+/// @brief This function compares a string with the equivalent
+/// string version of the given argument.
+/// @param str 
+/// @param to_compare 
+/// @return integer
+int compare_strings(string *str, typed_value to_compare)
+{
+  char  *s;
+  char  *ptr;
+  ui64  len_s;
+  ui64  len_t;
+
+  if (!str || !str->s)
+    return (0);
+  ptr = convert_types_to_pchar(to_compare);
+  if (!ptr)
+    return (-1);
+  s = str->s;
+  len_s = str->len;
+  len_t = stringlen(ptr);
+  while (len_s-- && len_t--)
+    if (s[len_s] != ptr[len_t])
+      return (0);
+  return (1);
+}
+
 /// @brief This function returns a struct with all functions that
 /// can be used with the string type.
 /// @param  
@@ -840,5 +864,6 @@ str_funcs   *String(void)
   string_functions.count = &count_in_string;
   string_functions.swap_case = &swap_string_case;
   string_functions.change = &change_string;
+  string_functions.compare = &compare_strings;
   return (&string_functions);
 }
