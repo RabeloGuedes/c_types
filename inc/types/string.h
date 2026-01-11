@@ -56,6 +56,7 @@ typedef struct string_metohods
     int     (*is_space)(const string *);
     int     (*is_title)(const string *);
     int     (*is_empty)(const string *);
+    int     (*count)(const string *, typed_value);
 }   str_funcs;
 
 

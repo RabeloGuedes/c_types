@@ -723,6 +723,38 @@ int is_string_empty(const string *str)
   return (!str->len);
 }
 
+/// @brief This function counts how many times the 
+/// @param str 
+/// @param t 
+/// @return 
+int  count_in_string(const string *str, typed_value t)
+{
+  char  *ptr;
+  char  *s;
+  int   count;
+  int   pos;
+
+  count = 0;
+  pos = 0;
+  if (!str || !str->s)
+    return (0);
+  ptr = convert_types_to_pchar(str, t);
+  if (!ptr)
+    return (-1);
+  s = str->s;
+  while (pos != -1)
+  {
+    pos = find_string(s, ptr, 1);
+    if (pos != -1)
+    {
+      s += pos + 1;
+      count++;
+    }
+  }
+  free(ptr);
+  return (count);
+}
+
 /// @brief This function returns a struct with all functions that
 /// can be used with the string type.
 /// @param  
@@ -753,5 +785,6 @@ str_funcs   *String(void)
   string_functions.is_space = &is_string_whitespaces;
   string_functions.is_title = &is_string_title;
   string_functions.is_empty = &is_string_empty;
+  string_functions.count = &count_in_string;
   return (&string_functions);
 }
