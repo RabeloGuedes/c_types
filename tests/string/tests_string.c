@@ -1871,6 +1871,155 @@ void test_capitalize_null(void)
 }
 
 // ============================================================================
+// Test Functions for String()->substring
+// ============================================================================
+
+void test_substring_basic(void)
+{
+    string *s = String()->new("hello world");
+    string *sub = String()->substring(s, 0, 5);
+    ASSERT_NOT_NULL(sub);
+    ASSERT(equals_string(sub, "hello"));
+    String()->del(&sub);
+    String()->del(&s);
+}
+
+void test_substring_middle(void)
+{
+    string *s = String()->new("hello world");
+    string *sub = String()->substring(s, 6, 11);
+    ASSERT_NOT_NULL(sub);
+    ASSERT(equals_string(sub, "world"));
+    String()->del(&sub);
+    String()->del(&s);
+}
+
+void test_substring_single_char(void)
+{
+    string *s = String()->new("hello");
+    string *sub = String()->substring(s, 0, 1);
+    ASSERT_NOT_NULL(sub);
+    ASSERT(equals_string(sub, "h"));
+    String()->del(&sub);
+    String()->del(&s);
+}
+
+void test_substring_entire_string(void)
+{
+    string *s = String()->new("hello");
+    string *sub = String()->substring(s, 0, 5);
+    ASSERT_NOT_NULL(sub);
+    ASSERT(equals_string(sub, "hello"));
+    String()->del(&sub);
+    String()->del(&s);
+}
+
+void test_substring_invalid_range(void)
+{
+    string *s = String()->new("hello");
+    string *sub = String()->substring(s, 5, 3);
+    ASSERT(sub == NULL);
+    String()->del(&s);
+}
+
+void test_substring_same_start_end(void)
+{
+    string *s = String()->new("hello");
+    string *sub = String()->substring(s, 2, 2);
+    ASSERT(sub == NULL);
+    String()->del(&s);
+}
+
+void test_substring_out_of_bounds(void)
+{
+    string *s = String()->new("hello");
+    string *sub = String()->substring(s, 0, 100);
+    // Should handle gracefully
+    if (sub != NULL)
+        String()->del(&sub);
+    String()->del(&s);
+}
+
+void test_substring_null_string(void)
+{
+    string *sub = String()->substring(NULL, 0, 5);
+    ASSERT(sub == NULL);
+}
+
+// ============================================================================
+// Test Functions for String()->trim
+// ============================================================================
+
+void test_trim_leading_spaces(void)
+{
+    string *s = String()->new("   hello");
+    String()->trim(s);
+    ASSERT(equals_string(s, "hello"));
+    String()->del(&s);
+}
+
+void test_trim_trailing_spaces(void)
+{
+    string *s = String()->new("hello   ");
+    String()->trim(s);
+    ASSERT(equals_string(s, "hello"));
+    String()->del(&s);
+}
+
+void test_trim_both_sides(void)
+{
+    string *s = String()->new("   hello   ");
+    String()->trim(s);
+    ASSERT(equals_string(s, "hello"));
+    String()->del(&s);
+}
+
+void test_trim_tabs(void)
+{
+    string *s = String()->new("\t\thello\t\t");
+    String()->trim(s);
+    ASSERT(equals_string(s, "hello"));
+    String()->del(&s);
+}
+
+void test_trim_mixed_whitespace(void)
+{
+    string *s = String()->new(" \t\n hello \t\n ");
+    String()->trim(s);
+    ASSERT(equals_string(s, "hello"));
+    String()->del(&s);
+}
+
+void test_trim_no_whitespace(void)
+{
+    string *s = String()->new("hello");
+    String()->trim(s);
+    ASSERT(equals_string(s, "hello"));
+    String()->del(&s);
+}
+
+void test_trim_only_whitespace(void)
+{
+    string *s = String()->new("     ");
+    String()->trim(s);
+    ASSERT_EQ(String()->len(s), 0);
+    String()->del(&s);
+}
+
+void test_trim_empty(void)
+{
+    string *s = String()->new("");
+    String()->trim(s);
+    ASSERT_EQ(String()->len(s), 0);
+    String()->del(&s);
+}
+
+void test_trim_null(void)
+{
+    String()->trim(NULL);
+}
+
+// ============================================================================
 // Edge Cases
 // ============================================================================
 
@@ -2296,6 +2445,35 @@ int main(int argc, char **argv)
     TEST("capitalize: single char", test_capitalize_single_char());
     TEST("capitalize: empty string", test_capitalize_empty());
     TEST_NULL_SAFE("capitalize: NULL input", test_capitalize_null());
+    
+    // ─────────────────────────────────────────────────────────────────────
+    // String()->substring tests
+    // ─────────────────────────────────────────────────────────────────────
+    print_suite_header("String()->substring");
+    
+    TEST("substring: basic", test_substring_basic());
+    TEST("substring: middle", test_substring_middle());
+    TEST("substring: single char", test_substring_single_char());
+    TEST("substring: entire string", test_substring_entire_string());
+    TEST("substring: invalid range", test_substring_invalid_range());
+    TEST("substring: same start/end", test_substring_same_start_end());
+    TEST("substring: out of bounds", test_substring_out_of_bounds());
+    TEST_NULL_SAFE("substring: NULL string", test_substring_null_string());
+    
+    // ─────────────────────────────────────────────────────────────────────
+    // String()->trim tests
+    // ─────────────────────────────────────────────────────────────────────
+    print_suite_header("String()->trim");
+    
+    TEST("trim: leading spaces", test_trim_leading_spaces());
+    TEST("trim: trailing spaces", test_trim_trailing_spaces());
+    TEST("trim: both sides", test_trim_both_sides());
+    TEST("trim: tabs", test_trim_tabs());
+    TEST("trim: mixed whitespace", test_trim_mixed_whitespace());
+    TEST("trim: no whitespace", test_trim_no_whitespace());
+    TEST("trim: only whitespace", test_trim_only_whitespace());
+    TEST("trim: empty string", test_trim_empty());
+    TEST_NULL_SAFE("trim: NULL input", test_trim_null());
     
     // ─────────────────────────────────────────────────────────────────────
     // Edge case tests

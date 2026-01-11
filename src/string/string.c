@@ -878,28 +878,32 @@ string  *substring(const string *str, ui64 start, ui64 end)
   char    *ptr;
   char    *s;
   ui64    len;
+  ui64    i;
 
   if (!str || !str->s || start >= end)
     return (NULL);
+  if (end > str->len)
+    end = str->len;
+  len = end - start;
   p = new_string("");
   if (!p)
     return (NULL);
-  ptr = calloc(end - start + 1, sizeof(char));
+  ptr = calloc(len + 1, sizeof(char));
   if (!ptr)
   {
     dealloc_string(&p);
     return (NULL);
   }
   s = str->s;
-  len = str->len;
-  while (start <= end && start < len)
+  i = 0;
+  while (i < len)
   {
-    ptr[start] = s[start];
-    start++;
+    ptr[i] = s[start + i];
+    i++;
   }
   free(p->s);
   p->s = ptr;
-  p->len = stringlen(ptr);
+  p->len = len;
   p->capacity = len + 1;
   return (p);
 }
@@ -911,31 +915,38 @@ void  trim_string(string *str)
   char  *ptr;
   ui64  start;
   ui64  end;
-  ui64  len;
+  ui64  new_len;
+  ui64  i;
 
   if (!str || !str->s)
     return ;
-  len = str->len;
+  start = 0;
   end = str->len;
   ptr = str->s;
-  while (len-- && ((ptr[start] >= '\t' && ptr[start] <= '\r') || ptr[start] = ' '))
-    start;
+  while (start < end && ((ptr[start] >= '\t' && ptr[start] <= '\r') || ptr[start] == ' '))
+    start++;
   if (start == end)
+  {
+    str->s[0] = '\0';
+    str->len = 0;
     return ;
-  while (end-- && ((ptr[end] >= '\t' && ptr[end] <= '\r') || ptr[end] = ' '))
-    ;
-  ptr = calloc(end - start + 1, sizeof(char));
+  }
+  while (end > start && ((ptr[end - 1] >= '\t' && ptr[end - 1] <= '\r') || ptr[end - 1] == ' '))
+    end--;
+  new_len = end - start;
+  ptr = calloc(new_len + 1, sizeof(char));
   if (!ptr)
     return ;
-  while (start <= end)
+  i = 0;
+  while (i < new_len)
   {
-    ptr[start] = str->s[start];
-    start++;
+    ptr[i] = str->s[start + i];
+    i++;
   }
   free(str->s);
   str->s = ptr;
-  str->len = stringlen(ptr);
-  str->capacity = str->len + 1;
+  str->len = new_len;
+  str->capacity = new_len + 1;
 }
 
 /// @brief This function returns a struct with all functions that
