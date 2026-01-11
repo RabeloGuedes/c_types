@@ -726,7 +726,7 @@ int is_string_empty(const string *str)
 /// @brief This function counts how many times the 
 /// @param str 
 /// @param t 
-/// @return 
+/// @return integer
 int  count_in_string(const string *str, typed_value t)
 {
   char  *ptr;
@@ -776,6 +776,35 @@ void  swap_string_case(string *str)
   }
 }
 
+/// @brief This function replaces the current string by the given char pointer.
+/// @param str 
+/// @param s 
+void  change_string(string *str, char *s)
+{
+  char  *ptr;
+  ui64  len;
+
+  if (!str)
+    return ;
+  if (!s)
+  {
+    free(str->s);
+    str->s = NULL;
+    str->capacity = 0;
+    str->len = 0;
+    return ;
+  }
+  len = stringlen(s);
+  ptr = calloc(len + 1, sizeof(char));
+  if (!ptr)
+    return ;
+  memorycopy(ptr, s, len);
+  free(str->s);
+  str->s = ptr;
+  str->len = len;
+  str->capacity = str->len + 1;
+}
+
 /// @brief This function returns a struct with all functions that
 /// can be used with the string type.
 /// @param  
@@ -808,5 +837,6 @@ str_funcs   *String(void)
   string_functions.is_empty = &is_string_empty;
   string_functions.count = &count_in_string;
   string_functions.swap_case = &swap_string_case;
+  string_functions.change = &change_string;
   return (&string_functions);
 }
