@@ -599,7 +599,7 @@ int is_string_decimal(const string *str)
   return (1);
 }
 
-/// @brief Verifies if the string is composed of only lower case characters.
+/// @brief Verifies if the string is composed only of lower case characters.
 /// @param str 
 /// @return 1 or 0
 int is_string_lower(const string *str)
@@ -620,7 +620,7 @@ int is_string_lower(const string *str)
   return (1);
 }
 
-/// @brief Verifies if the string is composed of only upper case characters.
+/// @brief Verifies if the string is composed only of upper case characters.
 /// @param str 
 /// @return 1 or 0
 int is_string_upper(const string *str)
@@ -641,7 +641,7 @@ int is_string_upper(const string *str)
   return (1);
 }
 
-/// @brief Verifies if the string is composed of only printable characters.
+/// @brief Verifies if the string is composed only of printable characters.
 /// @param str 
 /// @return 1 or 0
 int is_string_printable(const string *str)
@@ -657,6 +657,57 @@ int is_string_printable(const string *str)
   {
     if ((*ptr < '\t' || *ptr > '\r') && (*ptr < ' ' || *ptr > '~'))
       return (0);
+    ptr++;
+  }
+  return (1);
+}
+
+/// @brief Verifies if the string is composed only of white spaces characters.
+/// @param str 
+/// @return 1 or 0
+int is_string_whitespaces(const string *str)
+{
+  char  *ptr;
+  ui64  len;
+
+  if (!str || !str->s)
+    return (0);
+  len = str->len;
+  ptr = str->s;
+  while (len--)
+  {
+    if ((*ptr < '\t' || *ptr > '\r') && *ptr != ' ')
+      return (0);
+    ptr++;
+  }
+  return (1);
+}
+
+/// @brief Verifies if the string is titled.
+/// @param str 
+/// @return 1 or 0
+int is_string_title(const string *str)
+{
+  char  *ptr;
+  ui64  len;
+  char  was_separator;
+
+  was_separator = 1;
+  if (!str || !str->s)
+    return (0);
+  len = str->len;
+  ptr = str->s;
+  while (len--)
+  {
+    if (!was_separator && (*ptr >= 'A' && *ptr <= 'Z'))
+      return (0);
+    if ((*ptr >= '0' && *ptr <= '9')
+      || (*ptr >= ',' && *ptr <= '/')
+      || (*ptr >= '\t' && *ptr <= '\r')
+      || *ptr == ' ')
+      was_separator = 1;
+    else
+      was_separator = 0;
     ptr++;
   }
   return (1);
@@ -689,5 +740,7 @@ str_funcs   *String(void)
   string_functions.is_lower = &is_string_lower;
   string_functions.is_upper = &is_string_upper;
   string_functions.is_printable = &is_string_printable;
+  string_functions.is_space = &is_string_whitespaces;
+  string_functions.is_title = &is_string_title;
   return (&string_functions);
 }
