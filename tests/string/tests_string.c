@@ -1410,6 +1410,103 @@ void test_is_empty_null(void)
 }
 
 // ============================================================================
+// Test Functions for String()->count
+// ============================================================================
+
+void test_count_pchar_single(void)
+{
+    string *s = String()->new("hello world");
+    ASSERT_EQ(String()->count(s, VAL_PCHAR("world")), 1);
+    String()->del(&s);
+}
+
+void test_count_pchar_multiple(void)
+{
+    string *s = String()->new("hello hello hello");
+    ASSERT_EQ(String()->count(s, VAL_PCHAR("hello")), 3);
+    String()->del(&s);
+}
+
+void test_count_pchar_none(void)
+{
+    string *s = String()->new("hello world");
+    ASSERT_EQ(String()->count(s, VAL_PCHAR("foo")), 0);
+    String()->del(&s);
+}
+
+void test_count_pchar_overlapping(void)
+{
+    // "aaa" searching for "aa" - depends on implementation
+    string *s = String()->new("aaa");
+    int result = String()->count(s, VAL_PCHAR("aa"));
+    // Could be 1 or 2 depending on overlapping handling
+    ASSERT(result >= 1);
+    String()->del(&s);
+}
+
+void test_count_char_single(void)
+{
+    string *s = String()->new("hello");
+    ASSERT_EQ(String()->count(s, VAL_CHAR('e')), 1);
+    String()->del(&s);
+}
+
+void test_count_char_multiple(void)
+{
+    string *s = String()->new("hello");
+    ASSERT_EQ(String()->count(s, VAL_CHAR('l')), 2);
+    String()->del(&s);
+}
+
+void test_count_char_none(void)
+{
+    string *s = String()->new("hello");
+    ASSERT_EQ(String()->count(s, VAL_CHAR('z')), 0);
+    String()->del(&s);
+}
+
+void test_count_int_single(void)
+{
+    string *s = String()->new("test 42 test");
+    ASSERT_EQ(String()->count(s, VAL_INT(42)), 1);
+    String()->del(&s);
+}
+
+void test_count_int_multiple(void)
+{
+    string *s = String()->new("42 is 42 and 42");
+    ASSERT_EQ(String()->count(s, VAL_INT(42)), 3);
+    String()->del(&s);
+}
+
+void test_count_int_none(void)
+{
+    string *s = String()->new("hello world");
+    ASSERT_EQ(String()->count(s, VAL_INT(42)), 0);
+    String()->del(&s);
+}
+
+void test_count_empty_string(void)
+{
+    string *s = String()->new("");
+    ASSERT_EQ(String()->count(s, VAL_PCHAR("test")), 0);
+    String()->del(&s);
+}
+
+void test_count_null_string(void)
+{
+    ASSERT_EQ(String()->count(NULL, VAL_PCHAR("test")), 0);
+}
+
+void test_count_null_value(void)
+{
+    string *s = String()->new("hello world");
+    int result = String()->count(s, VAL_PCHAR(NULL));
+    ASSERT(result == 0 || result == -1);
+    String()->del(&s);
+}
+
+// ============================================================================
 // Edge Cases
 // ============================================================================
 
@@ -1747,6 +1844,25 @@ int main(int argc, char **argv)
     TEST("is_empty: whitespace", test_is_empty_whitespace());
     TEST("is_empty: long string", test_is_empty_long_string());
     TEST_NULL_SAFE("is_empty: NULL input", test_is_empty_null());
+    
+    // ─────────────────────────────────────────────────────────────────────
+    // String()->count tests
+    // ─────────────────────────────────────────────────────────────────────
+    print_suite_header("String()->count");
+    
+    TEST("count: pchar single", test_count_pchar_single());
+    TEST("count: pchar multiple", test_count_pchar_multiple());
+    TEST("count: pchar none", test_count_pchar_none());
+    TEST("count: pchar overlapping", test_count_pchar_overlapping());
+    TEST("count: char single", test_count_char_single());
+    TEST("count: char multiple", test_count_char_multiple());
+    TEST("count: char none", test_count_char_none());
+    TEST("count: int single", test_count_int_single());
+    TEST("count: int multiple", test_count_int_multiple());
+    TEST("count: int none", test_count_int_none());
+    TEST("count: empty string", test_count_empty_string());
+    TEST_NULL_SAFE("count: NULL string", test_count_null_string());
+    TEST_NULL_SAFE("count: NULL value", test_count_null_value());
     
     // ─────────────────────────────────────────────────────────────────────
     // Edge case tests
