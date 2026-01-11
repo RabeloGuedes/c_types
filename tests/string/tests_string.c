@@ -1670,6 +1670,109 @@ void test_change_multiple_times(void)
 }
 
 // ============================================================================
+// Test Functions for String()->compare
+// ============================================================================
+
+void test_compare_pchar_equal(void)
+{
+    string *s = String()->new("hello");
+    ASSERT_EQ(String()->compare(s, VAL_PCHAR("hello")), 1);
+    String()->del(&s);
+}
+
+void test_compare_pchar_not_equal(void)
+{
+    string *s = String()->new("hello");
+    ASSERT_EQ(String()->compare(s, VAL_PCHAR("world")), 0);
+    String()->del(&s);
+}
+
+void test_compare_pchar_different_length(void)
+{
+    string *s = String()->new("hello");
+    ASSERT_EQ(String()->compare(s, VAL_PCHAR("hello world")), 0);
+    String()->del(&s);
+}
+
+void test_compare_pchar_substring(void)
+{
+    string *s = String()->new("hello world");
+    ASSERT_EQ(String()->compare(s, VAL_PCHAR("hello")), 0);
+    String()->del(&s);
+}
+
+void test_compare_pchar_empty(void)
+{
+    string *s = String()->new("");
+    ASSERT_EQ(String()->compare(s, VAL_PCHAR("")), 1);
+    String()->del(&s);
+}
+
+void test_compare_pchar_case_sensitive(void)
+{
+    string *s = String()->new("Hello");
+    ASSERT_EQ(String()->compare(s, VAL_PCHAR("hello")), 0);
+    String()->del(&s);
+}
+
+void test_compare_char_single(void)
+{
+    string *s = String()->new("a");
+    ASSERT_EQ(String()->compare(s, VAL_CHAR('a')), 1);
+    String()->del(&s);
+}
+
+void test_compare_char_not_equal(void)
+{
+    string *s = String()->new("a");
+    ASSERT_EQ(String()->compare(s, VAL_CHAR('b')), 0);
+    String()->del(&s);
+}
+
+void test_compare_int_equal(void)
+{
+    string *s = String()->new("42");
+    ASSERT_EQ(String()->compare(s, VAL_INT(42)), 1);
+    String()->del(&s);
+}
+
+void test_compare_int_not_equal(void)
+{
+    string *s = String()->new("42");
+    ASSERT_EQ(String()->compare(s, VAL_INT(123)), 0);
+    String()->del(&s);
+}
+
+void test_compare_int_negative(void)
+{
+    string *s = String()->new("-42");
+    ASSERT_EQ(String()->compare(s, VAL_INT(-42)), 1);
+    String()->del(&s);
+}
+
+void test_compare_string_type(void)
+{
+    string *s1 = String()->new("hello");
+    string *s2 = String()->new("hello");
+    ASSERT_EQ(String()->compare(s1, VAL_STR(s2)), 1);
+    String()->del(&s1);
+    String()->del(&s2);
+}
+
+void test_compare_null_string(void)
+{
+    ASSERT_EQ(String()->compare(NULL, VAL_PCHAR("hello")), 0);
+}
+
+void test_compare_null_value(void)
+{
+    string *s = String()->new("hello");
+    int result = String()->compare(s, VAL_PCHAR(NULL));
+    ASSERT(result == 0 || result == -1);
+    String()->del(&s);
+}
+
+// ============================================================================
 // Edge Cases
 // ============================================================================
 
@@ -2057,6 +2160,26 @@ int main(int argc, char **argv)
     TEST_NULL_SAFE("change: NULL value", test_change_with_null_value());
     TEST_NULL_SAFE("change: NULL string", test_change_null_string());
     TEST("change: multiple times", test_change_multiple_times());
+    
+    // ─────────────────────────────────────────────────────────────────────
+    // String()->compare tests
+    // ─────────────────────────────────────────────────────────────────────
+    print_suite_header("String()->compare");
+    
+    TEST("compare: pchar equal", test_compare_pchar_equal());
+    TEST("compare: pchar not equal", test_compare_pchar_not_equal());
+    TEST("compare: pchar different length", test_compare_pchar_different_length());
+    TEST("compare: pchar substring", test_compare_pchar_substring());
+    TEST("compare: pchar empty", test_compare_pchar_empty());
+    TEST("compare: pchar case sensitive", test_compare_pchar_case_sensitive());
+    TEST("compare: char single", test_compare_char_single());
+    TEST("compare: char not equal", test_compare_char_not_equal());
+    TEST("compare: int equal", test_compare_int_equal());
+    TEST("compare: int not equal", test_compare_int_not_equal());
+    TEST("compare: int negative", test_compare_int_negative());
+    TEST("compare: string type", test_compare_string_type());
+    TEST_NULL_SAFE("compare: NULL string", test_compare_null_string());
+    TEST_NULL_SAFE("compare: NULL value", test_compare_null_value());
     
     // ─────────────────────────────────────────────────────────────────────
     // Edge case tests

@@ -810,7 +810,7 @@ int  change_string(string *str, char *s)
 /// @param str 
 /// @param to_compare 
 /// @return integer
-int compare_strings(string *str, typed_value to_compare)
+int compare_strings(const string *str, typed_value to_compare)
 {
   char  *s;
   char  *ptr;
@@ -826,8 +826,14 @@ int compare_strings(string *str, typed_value to_compare)
   len_s = str->len;
   len_t = stringlen(ptr);
   while (len_s-- && len_t--)
+  {
     if (s[len_s] != ptr[len_t])
+    {
+      free(ptr);
       return (0);
+    }
+  }
+  free(ptr);
   return (1);
 }
 

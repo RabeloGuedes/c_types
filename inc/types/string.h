@@ -59,7 +59,7 @@ typedef struct string_metohods
     int     (*is_empty)(const string *);
     int     (*count)(const string *, typed_value);
     int     (*change)(string *, char *);
-    int     (*compare)(string *, typed_value);
+    int     (*compare)(const string *, typed_value);
 }   str_funcs;
 
 
