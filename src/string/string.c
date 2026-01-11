@@ -485,7 +485,7 @@ int  last_index_of_element(const string *str, typed_value val)
 /// @brief Verifies if the string or the internal pointer to char is NULL.
 /// @param str 
 /// @return 1 or 0
-int is_string_null(string *str)
+int is_string_null(const string *str)
 {
   return (!str || !str->s);
 }
@@ -493,7 +493,7 @@ int is_string_null(string *str)
 /// @brief Verifies if all characters in the string are alphabetic.
 /// @param str 
 /// @return 1 or 0
-int is_string_alpha(string *str)
+int is_string_alpha(const string *str)
 {
   char  *ptr;
   ui64  len;
@@ -511,11 +511,10 @@ int is_string_alpha(string *str)
   return (1);
 }
 
-
 /// @brief Verifies if all characters in the string are alphanumeric.
 /// @param str 
 /// @return 1 or 0
-int is_string_alnum(string *str)
+int is_string_alnum(const string *str)
 {
   char  *ptr;
   ui64  len;
@@ -533,11 +532,10 @@ int is_string_alnum(string *str)
   return (1);
 }
 
-
 /// @brief Verifies if all characters in the string are ASCII (0-127).
 /// @param str 
 /// @return 1 or 0
-int is_string_ascii(string *str)
+int is_string_ascii(const string *str)
 {
   char  *ptr;
   ui64  len;
@@ -549,6 +547,115 @@ int is_string_ascii(string *str)
   while (len--)
   {
     if ((unsigned char)*ptr > 127)
+      return (0);
+    ptr++;
+  }
+  return (1);
+}
+
+/// @brief Verifies if the all characters are digits.
+/// @param str 
+/// @return 1 or 0
+int is_string_digit(const string *str)
+{
+  char  *ptr;
+  ui64  len;
+
+  len = str->len;
+  if (!str || !str->s)
+    return (0);
+  ptr = str->s;
+  while (len--)
+  {
+    if (*ptr < '0' || *ptr > '9')
+      return (0);
+    ptr++;
+  }
+  return (1);
+}
+
+/// @brief Verifies if the string is decimal.
+/// @param str 
+/// @return 1 or 0
+int is_string_decimal(const string *str)
+{
+  char  *ptr;
+  ui64  len;
+  char  dot_found;
+
+  dot_found = 0;
+  len = str->len;
+  if (!str || !str->s)
+    return (0);
+  ptr = str->s;
+  while (len--)
+  {
+    if (((*ptr < '0' || *ptr > '9') && *ptr != '.') || (dot_found && *ptr == '.'))
+      return (0);
+    if (!dot_found && *ptr == '.')
+      dot_found = 1;
+    ptr++;
+  }
+  return (1);
+}
+
+/// @brief Verifies if the string is composed of only lower case characters.
+/// @param str 
+/// @return 1 or 0
+int is_string_lower(const string *str)
+{
+  char  *ptr;
+  ui64  len;
+
+  if (!str || !str->s)
+    return (0);
+  len = str->len;
+  ptr = str->s;
+  while (len--)
+  {
+    if (*ptr < 'a' || *ptr > 'z')
+      return (0);
+    ptr++;
+  }
+  return (1);
+}
+
+/// @brief Verifies if the string is composed of only upper case characters.
+/// @param str 
+/// @return 1 or 0
+int is_string_upper(const string *str)
+{
+  char  *ptr;
+  ui64  len;
+
+  if (!str || !str->s)
+    return (0);
+  len = str->len;
+  ptr = str->s;
+  while (len--)
+  {
+    if (*ptr < 'A' || *ptr > 'Z')
+      return (0);
+    ptr++;
+  }
+  return (1);
+}
+
+/// @brief Verifies if the string is composed of only printable characters.
+/// @param str 
+/// @return 1 or 0
+int is_string_printable(const string *str)
+{
+  char  *ptr;
+  ui64  len;
+
+  if (!str || !str->s)
+    return (0);
+  len = str->len;
+  ptr = str->s;
+  while (len--)
+  {
+    if ((*ptr < '\t' || *ptr > '\r') && (*ptr < ' ' || *ptr > '~'))
       return (0);
     ptr++;
   }
@@ -577,5 +684,10 @@ str_funcs   *String(void)
   string_functions.is_alpha = &is_string_alpha;
   string_functions.is_alnum = &is_string_alnum;
   string_functions.is_ascii = &is_string_ascii;
+  string_functions.is_digit = &is_string_digit;
+  string_functions.is_decimal = &is_string_decimal;
+  string_functions.is_lower = &is_string_lower;
+  string_functions.is_upper = &is_string_upper;
+  string_functions.is_printable = &is_string_printable;
   return (&string_functions);
 }
