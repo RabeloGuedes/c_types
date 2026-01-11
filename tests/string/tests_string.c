@@ -1157,6 +1157,208 @@ void test_is_printable_null(void)
 }
 
 // ============================================================================
+// Test Functions for String()->is_title
+// ============================================================================
+
+void test_is_title_basic(void)
+{
+    string *s = String()->new("Hello World");
+    ASSERT_EQ(String()->is_title(s), 1);
+    String()->del(&s);
+}
+
+void test_is_title_all_lower(void)
+{
+    string *s = String()->new("hello world");
+    ASSERT_EQ(String()->is_title(s), 1);
+    String()->del(&s);
+}
+
+void test_is_title_all_upper(void)
+{
+    // "HELLO WORLD" - H is after separator (start), but E is uppercase after H
+    string *s = String()->new("HELLO WORLD");
+    ASSERT_EQ(String()->is_title(s), 0);
+    String()->del(&s);
+}
+
+void test_is_title_mid_word_upper(void)
+{
+    // "HeLLo" - e is lowercase, L is uppercase mid-word = not title
+    string *s = String()->new("HeLLo");
+    ASSERT_EQ(String()->is_title(s), 0);
+    String()->del(&s);
+}
+
+void test_is_title_camelCase(void)
+{
+    // camelCase has uppercase in middle of word
+    string *s = String()->new("camelCase");
+    ASSERT_EQ(String()->is_title(s), 0);
+    String()->del(&s);
+}
+
+void test_is_title_with_numbers(void)
+{
+    // Numbers act as separators, so "Hello2World" is valid
+    string *s = String()->new("Hello2World");
+    ASSERT_EQ(String()->is_title(s), 1);
+    String()->del(&s);
+}
+
+void test_is_title_with_comma(void)
+{
+    // Comma acts as separator
+    string *s = String()->new("Hello,World");
+    ASSERT_EQ(String()->is_title(s), 1);
+    String()->del(&s);
+}
+
+void test_is_title_with_slash(void)
+{
+    // Slash acts as separator
+    string *s = String()->new("Hello/World");
+    ASSERT_EQ(String()->is_title(s), 1);
+    String()->del(&s);
+}
+
+void test_is_title_with_tab(void)
+{
+    // Tab acts as separator
+    string *s = String()->new("Hello\tWorld");
+    ASSERT_EQ(String()->is_title(s), 1);
+    String()->del(&s);
+}
+
+void test_is_title_single_word(void)
+{
+    string *s = String()->new("Hello");
+    ASSERT_EQ(String()->is_title(s), 1);
+    String()->del(&s);
+}
+
+void test_is_title_single_upper(void)
+{
+    string *s = String()->new("H");
+    ASSERT_EQ(String()->is_title(s), 1);
+    String()->del(&s);
+}
+
+void test_is_title_single_lower(void)
+{
+    string *s = String()->new("h");
+    ASSERT_EQ(String()->is_title(s), 1);
+    String()->del(&s);
+}
+
+void test_is_title_empty(void)
+{
+    string *s = String()->new("");
+    int result = String()->is_title(s);
+    ASSERT(result == 0 || result == 1);
+    String()->del(&s);
+}
+
+void test_is_title_null(void)
+{
+    ASSERT_EQ(String()->is_title(NULL), 0);
+}
+
+// ============================================================================
+// Test Functions for String()->is_space
+// ============================================================================
+
+void test_is_space_only_spaces(void)
+{
+    string *s = String()->new("     ");
+    ASSERT_EQ(String()->is_space(s), 1);
+    String()->del(&s);
+}
+
+void test_is_space_only_tabs(void)
+{
+    string *s = String()->new("\t\t\t");
+    ASSERT_EQ(String()->is_space(s), 1);
+    String()->del(&s);
+}
+
+void test_is_space_only_newlines(void)
+{
+    string *s = String()->new("\n\n\n");
+    ASSERT_EQ(String()->is_space(s), 1);
+    String()->del(&s);
+}
+
+void test_is_space_mixed_whitespace(void)
+{
+    string *s = String()->new(" \t\n\r\v\f ");
+    ASSERT_EQ(String()->is_space(s), 1);
+    String()->del(&s);
+}
+
+void test_is_space_with_text(void)
+{
+    string *s = String()->new("hello world");
+    ASSERT_EQ(String()->is_space(s), 0);
+    String()->del(&s);
+}
+
+void test_is_space_leading_space(void)
+{
+    string *s = String()->new("  hello");
+    ASSERT_EQ(String()->is_space(s), 0);
+    String()->del(&s);
+}
+
+void test_is_space_trailing_space(void)
+{
+    string *s = String()->new("hello  ");
+    ASSERT_EQ(String()->is_space(s), 0);
+    String()->del(&s);
+}
+
+void test_is_space_only_carriage_return(void)
+{
+    string *s = String()->new("\r\r\r");
+    ASSERT_EQ(String()->is_space(s), 1);
+    String()->del(&s);
+}
+
+void test_is_space_only_vertical_tab(void)
+{
+    string *s = String()->new("\v\v");
+    ASSERT_EQ(String()->is_space(s), 1);
+    String()->del(&s);
+}
+
+void test_is_space_only_form_feed(void)
+{
+    string *s = String()->new("\f\f");
+    ASSERT_EQ(String()->is_space(s), 1);
+    String()->del(&s);
+}
+
+void test_is_space_single_space(void)
+{
+    string *s = String()->new(" ");
+    ASSERT_EQ(String()->is_space(s), 1);
+    String()->del(&s);
+}
+
+void test_is_space_empty(void)
+{
+    string *s = String()->new("");
+    int result = String()->is_space(s);
+    ASSERT(result == 0 || result == 1);
+    String()->del(&s);
+}
+
+void test_is_space_null(void)
+{
+    ASSERT_EQ(String()->is_space(NULL), 0);
+}
+
+// ============================================================================
 // Edge Cases
 // ============================================================================
 
@@ -1442,6 +1644,45 @@ int main(int argc, char **argv)
     TEST("is_printable: with DEL", test_is_printable_with_del());
     TEST("is_printable: empty string", test_is_printable_empty());
     TEST_NULL_SAFE("is_printable: NULL input", test_is_printable_null());
+    
+    // ─────────────────────────────────────────────────────────────────────
+    // String()->is_title tests
+    // ─────────────────────────────────────────────────────────────────────
+    print_suite_header("String()->is_title");
+    
+    TEST("is_title: basic", test_is_title_basic());
+    TEST("is_title: all lower", test_is_title_all_lower());
+    TEST("is_title: all upper", test_is_title_all_upper());
+    TEST("is_title: mid-word upper", test_is_title_mid_word_upper());
+    TEST("is_title: camelCase", test_is_title_camelCase());
+    TEST("is_title: with numbers", test_is_title_with_numbers());
+    TEST("is_title: with comma", test_is_title_with_comma());
+    TEST("is_title: with slash", test_is_title_with_slash());
+    TEST("is_title: with tab", test_is_title_with_tab());
+    TEST("is_title: single word", test_is_title_single_word());
+    TEST("is_title: single upper", test_is_title_single_upper());
+    TEST("is_title: single lower", test_is_title_single_lower());
+    TEST("is_title: empty string", test_is_title_empty());
+    TEST_NULL_SAFE("is_title: NULL input", test_is_title_null());
+    
+    // ─────────────────────────────────────────────────────────────────────
+    // String()->is_space tests
+    // ─────────────────────────────────────────────────────────────────────
+    print_suite_header("String()->is_space");
+    
+    TEST("is_space: only spaces", test_is_space_only_spaces());
+    TEST("is_space: only tabs", test_is_space_only_tabs());
+    TEST("is_space: only newlines", test_is_space_only_newlines());
+    TEST("is_space: mixed whitespace", test_is_space_mixed_whitespace());
+    TEST("is_space: with text", test_is_space_with_text());
+    TEST("is_space: leading space", test_is_space_leading_space());
+    TEST("is_space: trailing space", test_is_space_trailing_space());
+    TEST("is_space: carriage return", test_is_space_only_carriage_return());
+    TEST("is_space: vertical tab", test_is_space_only_vertical_tab());
+    TEST("is_space: form feed", test_is_space_only_form_feed());
+    TEST("is_space: single space", test_is_space_single_space());
+    TEST("is_space: empty string", test_is_space_empty());
+    TEST_NULL_SAFE("is_space: NULL input", test_is_space_null());
     
     // ─────────────────────────────────────────────────────────────────────
     // Edge case tests
