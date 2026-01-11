@@ -1589,6 +1589,87 @@ void test_swap_case_null(void)
 }
 
 // ============================================================================
+// Test Functions for String()->change
+// ============================================================================
+
+void test_change_basic(void)
+{
+    string *s = String()->new("hello");
+    String()->change(s, "world");
+    ASSERT(equals_string(s, "world"));
+    ASSERT_EQ(String()->len(s), 5);
+    String()->del(&s);
+}
+
+void test_change_to_longer(void)
+{
+    string *s = String()->new("hi");
+    String()->change(s, "hello world");
+    ASSERT(equals_string(s, "hello world"));
+    ASSERT_EQ(String()->len(s), 11);
+    String()->del(&s);
+}
+
+void test_change_to_shorter(void)
+{
+    string *s = String()->new("hello world");
+    String()->change(s, "hi");
+    ASSERT(equals_string(s, "hi"));
+    ASSERT_EQ(String()->len(s), 2);
+    String()->del(&s);
+}
+
+void test_change_to_empty(void)
+{
+    string *s = String()->new("hello");
+    String()->change(s, "");
+    ASSERT(equals_string(s, ""));
+    ASSERT_EQ(String()->len(s), 0);
+    String()->del(&s);
+}
+
+void test_change_from_empty(void)
+{
+    string *s = String()->new("");
+    String()->change(s, "hello");
+    ASSERT(equals_string(s, "hello"));
+    ASSERT_EQ(String()->len(s), 5);
+    String()->del(&s);
+}
+
+void test_change_to_same(void)
+{
+    string *s = String()->new("hello");
+    String()->change(s, "hello");
+    ASSERT(equals_string(s, "hello"));
+    ASSERT_EQ(String()->len(s), 5);
+    String()->del(&s);
+}
+
+void test_change_with_null_value(void)
+{
+    string *s = String()->new("hello");
+    String()->change(s, NULL);
+    // Should clear the string
+    ASSERT_EQ(String()->len(s), 0);
+    String()->del(&s);
+}
+
+void test_change_null_string(void)
+{
+    String()->change(NULL, "hello");
+}
+
+void test_change_multiple_times(void)
+{
+    string *s = String()->new("first");
+    String()->change(s, "second");
+    String()->change(s, "third");
+    ASSERT(equals_string(s, "third"));
+    String()->del(&s);
+}
+
+// ============================================================================
 // Edge Cases
 // ============================================================================
 
@@ -1961,6 +2042,21 @@ int main(int argc, char **argv)
     TEST("swap_case: single upper", test_swap_case_single_upper());
     TEST("swap_case: double swap", test_swap_case_double_swap());
     TEST_NULL_SAFE("swap_case: NULL input", test_swap_case_null());
+    
+    // ─────────────────────────────────────────────────────────────────────
+    // String()->change tests
+    // ─────────────────────────────────────────────────────────────────────
+    print_suite_header("String()->change");
+    
+    TEST("change: basic", test_change_basic());
+    TEST("change: to longer", test_change_to_longer());
+    TEST("change: to shorter", test_change_to_shorter());
+    TEST("change: to empty", test_change_to_empty());
+    TEST("change: from empty", test_change_from_empty());
+    TEST("change: to same", test_change_to_same());
+    TEST_NULL_SAFE("change: NULL value", test_change_with_null_value());
+    TEST_NULL_SAFE("change: NULL string", test_change_null_string());
+    TEST("change: multiple times", test_change_multiple_times());
     
     // ─────────────────────────────────────────────────────────────────────
     // Edge case tests

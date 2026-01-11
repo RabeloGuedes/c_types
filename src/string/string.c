@@ -779,30 +779,32 @@ void  swap_string_case(string *str)
 /// @brief This function replaces the current string by the given char pointer.
 /// @param str 
 /// @param s 
-void  change_string(string *str, char *s)
+/// @return 1 on success, 0 on failure
+int  change_string(string *str, char *s)
 {
   char  *ptr;
   ui64  len;
 
   if (!str)
-    return ;
+    return (0);
   if (!s)
   {
     free(str->s);
     str->s = NULL;
     str->capacity = 0;
     str->len = 0;
-    return ;
+    return (1);
   }
   len = stringlen(s);
   ptr = calloc(len + 1, sizeof(char));
   if (!ptr)
-    return ;
+    return (0);
   memorycopy(ptr, s, len);
   free(str->s);
   str->s = ptr;
   str->len = len;
   str->capacity = str->len + 1;
+  return (1);
 }
 
 /// @brief This function returns a struct with all functions that
