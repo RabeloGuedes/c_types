@@ -768,9 +768,9 @@ void  swap_string_case(string *str)
   len = str->len;
   while (len--)
   {
-    if (*ptr >= 'a' || *ptr <= 'z')
+    if (*ptr >= 'a' && *ptr <= 'z')
       *ptr = *ptr - ('a' - 'A');
-    else if (*ptr >= 'A' || *ptr <= 'Z')
+    else if (*ptr >= 'A' && *ptr <= 'Z')
       *ptr = *ptr + ('a' - 'A');
     ptr++;
   }

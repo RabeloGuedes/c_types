@@ -1507,6 +1507,88 @@ void test_count_null_value(void)
 }
 
 // ============================================================================
+// Test Functions for String()->swap_case
+// ============================================================================
+
+void test_swap_case_all_lower(void)
+{
+    string *s = String()->new("hello");
+    String()->swap_case(s);
+    ASSERT(equals_string(s, "HELLO"));
+    String()->del(&s);
+}
+
+void test_swap_case_all_upper(void)
+{
+    string *s = String()->new("HELLO");
+    String()->swap_case(s);
+    ASSERT(equals_string(s, "hello"));
+    String()->del(&s);
+}
+
+void test_swap_case_mixed(void)
+{
+    string *s = String()->new("HeLLo WoRLd");
+    String()->swap_case(s);
+    ASSERT(equals_string(s, "hEllO wOrlD"));
+    String()->del(&s);
+}
+
+void test_swap_case_with_numbers(void)
+{
+    string *s = String()->new("Hello123World");
+    String()->swap_case(s);
+    ASSERT(equals_string(s, "hELLO123wORLD"));
+    String()->del(&s);
+}
+
+void test_swap_case_with_symbols(void)
+{
+    string *s = String()->new("Hello, World!");
+    String()->swap_case(s);
+    ASSERT(equals_string(s, "hELLO, wORLD!"));
+    String()->del(&s);
+}
+
+void test_swap_case_empty(void)
+{
+    string *s = String()->new("");
+    String()->swap_case(s);
+    ASSERT_EQ(String()->len(s), 0);
+    String()->del(&s);
+}
+
+void test_swap_case_single_lower(void)
+{
+    string *s = String()->new("a");
+    String()->swap_case(s);
+    ASSERT(equals_string(s, "A"));
+    String()->del(&s);
+}
+
+void test_swap_case_single_upper(void)
+{
+    string *s = String()->new("A");
+    String()->swap_case(s);
+    ASSERT(equals_string(s, "a"));
+    String()->del(&s);
+}
+
+void test_swap_case_double_swap(void)
+{
+    string *s = String()->new("Hello World");
+    String()->swap_case(s);
+    String()->swap_case(s);
+    ASSERT(equals_string(s, "Hello World"));
+    String()->del(&s);
+}
+
+void test_swap_case_null(void)
+{
+    String()->swap_case(NULL);
+}
+
+// ============================================================================
 // Edge Cases
 // ============================================================================
 
@@ -1863,6 +1945,22 @@ int main(int argc, char **argv)
     TEST("count: empty string", test_count_empty_string());
     TEST_NULL_SAFE("count: NULL string", test_count_null_string());
     TEST_NULL_SAFE("count: NULL value", test_count_null_value());
+    
+    // ─────────────────────────────────────────────────────────────────────
+    // String()->swap_case tests
+    // ─────────────────────────────────────────────────────────────────────
+    print_suite_header("String()->swap_case");
+    
+    TEST("swap_case: all lower", test_swap_case_all_lower());
+    TEST("swap_case: all upper", test_swap_case_all_upper());
+    TEST("swap_case: mixed", test_swap_case_mixed());
+    TEST("swap_case: with numbers", test_swap_case_with_numbers());
+    TEST("swap_case: with symbols", test_swap_case_with_symbols());
+    TEST("swap_case: empty string", test_swap_case_empty());
+    TEST("swap_case: single lower", test_swap_case_single_lower());
+    TEST("swap_case: single upper", test_swap_case_single_upper());
+    TEST("swap_case: double swap", test_swap_case_double_swap());
+    TEST_NULL_SAFE("swap_case: NULL input", test_swap_case_null());
     
     // ─────────────────────────────────────────────────────────────────────
     // Edge case tests
