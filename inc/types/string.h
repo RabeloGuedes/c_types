@@ -44,6 +44,18 @@ typedef struct string_metohods
     void    (*to_upper)(string *);
     int     (*index_of)(const string *, typed_value);
     int     (*last_index_of)(const string *, typed_value);
+    int     (*is_null)(string *);
+    int     (*is_alpha)(string *);
+    int     (*is_alnum)(string *);
+    int     (*is_ascii)(string *);
+    int     (*is_digit)(string *);
+    int     (*is_decimal)(string *);
+    int     (*is_lower)(string *);
+    int     (*is_upper)(string *);
+    int     (*is_printable)(string *);
+    int     (*is_space)(string *);
+    int     (*is_title)(string *);
+    int     (*is_empty)(string *);
 }   str_funcs;
 
 

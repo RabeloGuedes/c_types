@@ -482,6 +482,79 @@ int  last_index_of_element(const string *str, typed_value val)
   return (index);
 }
 
+/// @brief Verifies if the string or the internal pointer to char is NULL.
+/// @param str 
+/// @return 1 or 0
+int is_string_null(string *str)
+{
+  return (!str || !str->s);
+}
+
+/// @brief Verifies if all characters in the string are alphabetic.
+/// @param str 
+/// @return 1 or 0
+int is_string_alpha(string *str)
+{
+  char  *ptr;
+  ui64  len;
+
+  if (!str || !str->s)
+    return (0);
+  len = str->len;
+  ptr = str->s;
+  while (len--)
+  {
+    if ((*ptr < 'A' || *ptr > 'Z') && (*ptr < 'a' || *ptr > 'z'))
+      return (0);
+    ptr++;
+  }
+  return (1);
+}
+
+
+/// @brief Verifies if all characters in the string are alphanumeric.
+/// @param str 
+/// @return 1 or 0
+int is_string_alnum(string *str)
+{
+  char  *ptr;
+  ui64  len;
+
+  if (!str || !str->s)
+    return (0);
+  len = str->len;
+  ptr = str->s;
+  while (len--)
+  {
+    if ((*ptr < 'A' || *ptr > 'Z') && (*ptr < 'a' || *ptr > 'z') && (*ptr < '0' || *ptr > '9'))
+      return (0);
+    ptr++;
+  }
+  return (1);
+}
+
+
+/// @brief Verifies if all characters in the string are ASCII (0-127).
+/// @param str 
+/// @return 1 or 0
+int is_string_ascii(string *str)
+{
+  char  *ptr;
+  ui64  len;
+
+  if (!str || !str->s)
+    return (0);
+  len = str->len;
+  ptr = str->s;
+  while (len--)
+  {
+    if ((unsigned char)*ptr > 127)
+      return (0);
+    ptr++;
+  }
+  return (1);
+}
+
 /// @brief This function returns a struct with all functions that
 /// can be used with the string type.
 /// @param  
@@ -500,5 +573,9 @@ str_funcs   *String(void)
   string_functions.to_upper = &upper_string;
   string_functions.index_of = &index_of_element;
   string_functions.last_index_of = &last_index_of_element;
+  string_functions.is_null = &is_string_null;
+  string_functions.is_alpha = &is_string_alpha;
+  string_functions.is_alnum = &is_string_alnum;
+  string_functions.is_ascii = &is_string_ascii;
   return (&string_functions);
 }
