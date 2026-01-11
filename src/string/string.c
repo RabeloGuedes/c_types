@@ -755,6 +755,27 @@ int  count_in_string(const string *str, typed_value t)
   return (count);
 }
 
+/// @brief This function swaps the case of the characters in the string.
+/// @param str 
+void  swap_string_case(string *str)
+{
+  char  *ptr;
+  ui64  len;
+
+  if (!str || !str->s)
+    return ;
+  ptr = str->s;
+  len = str->len;
+  while (len--)
+  {
+    if (*ptr >= 'a' || *ptr <= 'z')
+      *ptr = *ptr - ('a' - 'A');
+    else if (*ptr >= 'A' || *ptr <= 'Z')
+      *ptr = *ptr + ('a' - 'A');
+    ptr++;
+  }
+}
+
 /// @brief This function returns a struct with all functions that
 /// can be used with the string type.
 /// @param  
@@ -786,5 +807,6 @@ str_funcs   *String(void)
   string_functions.is_title = &is_string_title;
   string_functions.is_empty = &is_string_empty;
   string_functions.count = &count_in_string;
+  string_functions.swap_case = &swap_string_case;
   return (&string_functions);
 }

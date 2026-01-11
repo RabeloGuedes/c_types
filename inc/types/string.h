@@ -42,6 +42,7 @@ typedef struct string_metohods
     string  *(*clone)(string *);
     void    (*to_lower)(string *);
     void    (*to_upper)(string *);
+    void    (*swap_case)(string *);
     int     (*index_of)(const string *, typed_value);
     int     (*last_index_of)(const string *, typed_value);
     int     (*is_null)(const string *);
