@@ -723,6 +723,219 @@ void test_last_index_of_null_value(void)
 }
 
 // ============================================================================
+// Test Functions for String()->is_null
+// ============================================================================
+
+void test_is_null_with_null_ptr(void)
+{
+    ASSERT_EQ(String()->is_null(NULL), 1);
+}
+
+void test_is_null_with_valid_string(void)
+{
+    string *s = String()->new("hello");
+    ASSERT_EQ(String()->is_null(s), 0);
+    String()->del(&s);
+}
+
+void test_is_null_with_empty_string(void)
+{
+    string *s = String()->new("");
+    ASSERT_EQ(String()->is_null(s), 0);
+    String()->del(&s);
+}
+
+// ============================================================================
+// Test Functions for String()->is_alpha
+// ============================================================================
+
+void test_is_alpha_all_lower(void)
+{
+    string *s = String()->new("hello");
+    ASSERT_EQ(String()->is_alpha(s), 1);
+    String()->del(&s);
+}
+
+void test_is_alpha_all_upper(void)
+{
+    string *s = String()->new("HELLO");
+    ASSERT_EQ(String()->is_alpha(s), 1);
+    String()->del(&s);
+}
+
+void test_is_alpha_mixed_case(void)
+{
+    string *s = String()->new("HeLLo");
+    ASSERT_EQ(String()->is_alpha(s), 1);
+    String()->del(&s);
+}
+
+void test_is_alpha_with_numbers(void)
+{
+    string *s = String()->new("hello123");
+    ASSERT_EQ(String()->is_alpha(s), 0);
+    String()->del(&s);
+}
+
+void test_is_alpha_with_space(void)
+{
+    string *s = String()->new("hello world");
+    ASSERT_EQ(String()->is_alpha(s), 0);
+    String()->del(&s);
+}
+
+void test_is_alpha_with_symbols(void)
+{
+    string *s = String()->new("hello!");
+    ASSERT_EQ(String()->is_alpha(s), 0);
+    String()->del(&s);
+}
+
+void test_is_alpha_empty(void)
+{
+    string *s = String()->new("");
+    // Empty string has no non-alpha characters, but also no alpha characters
+    // Implementation may return 1 (vacuously true) or 0
+    int result = String()->is_alpha(s);
+    ASSERT(result == 0 || result == 1);
+    String()->del(&s);
+}
+
+void test_is_alpha_null(void)
+{
+    ASSERT_EQ(String()->is_alpha(NULL), 0);
+}
+
+// ============================================================================
+// Test Functions for String()->is_alnum
+// ============================================================================
+
+void test_is_alnum_all_alpha(void)
+{
+    string *s = String()->new("HelloWorld");
+    ASSERT_EQ(String()->is_alnum(s), 1);
+    String()->del(&s);
+}
+
+void test_is_alnum_all_digits(void)
+{
+    string *s = String()->new("1234567890");
+    ASSERT_EQ(String()->is_alnum(s), 1);
+    String()->del(&s);
+}
+
+void test_is_alnum_mixed(void)
+{
+    string *s = String()->new("Hello123World456");
+    ASSERT_EQ(String()->is_alnum(s), 1);
+    String()->del(&s);
+}
+
+void test_is_alnum_with_space(void)
+{
+    string *s = String()->new("Hello World");
+    ASSERT_EQ(String()->is_alnum(s), 0);
+    String()->del(&s);
+}
+
+void test_is_alnum_with_symbols(void)
+{
+    string *s = String()->new("hello@world");
+    ASSERT_EQ(String()->is_alnum(s), 0);
+    String()->del(&s);
+}
+
+void test_is_alnum_with_underscore(void)
+{
+    string *s = String()->new("hello_world");
+    ASSERT_EQ(String()->is_alnum(s), 0);
+    String()->del(&s);
+}
+
+void test_is_alnum_empty(void)
+{
+    string *s = String()->new("");
+    int result = String()->is_alnum(s);
+    ASSERT(result == 0 || result == 1);
+    String()->del(&s);
+}
+
+void test_is_alnum_null(void)
+{
+    ASSERT_EQ(String()->is_alnum(NULL), 0);
+}
+
+// ============================================================================
+// Test Functions for String()->is_ascii
+// ============================================================================
+
+void test_is_ascii_basic(void)
+{
+    string *s = String()->new("Hello, World!");
+    ASSERT_EQ(String()->is_ascii(s), 1);
+    String()->del(&s);
+}
+
+void test_is_ascii_all_printable(void)
+{
+    string *s = String()->new("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789");
+    ASSERT_EQ(String()->is_ascii(s), 1);
+    String()->del(&s);
+}
+
+void test_is_ascii_special_chars(void)
+{
+    string *s = String()->new("!@#$%^&*()_+-=[]{}|;':\",./<>?");
+    ASSERT_EQ(String()->is_ascii(s), 1);
+    String()->del(&s);
+}
+
+void test_is_ascii_with_newline(void)
+{
+    string *s = String()->new("hello\nworld");
+    ASSERT_EQ(String()->is_ascii(s), 1);
+    String()->del(&s);
+}
+
+void test_is_ascii_with_tab(void)
+{
+    string *s = String()->new("hello\tworld");
+    ASSERT_EQ(String()->is_ascii(s), 1);
+    String()->del(&s);
+}
+
+void test_is_ascii_with_high_byte(void)
+{
+    // Create string with a non-ASCII character (value > 127)
+    char non_ascii[] = "hello\x80world";
+    string *s = String()->new(non_ascii);
+    ASSERT_EQ(String()->is_ascii(s), 0);
+    String()->del(&s);
+}
+
+void test_is_ascii_with_utf8(void)
+{
+    // UTF-8 encoded character (e.g., é = 0xC3 0xA9)
+    char utf8[] = "caf\xc3\xa9";
+    string *s = String()->new(utf8);
+    ASSERT_EQ(String()->is_ascii(s), 0);
+    String()->del(&s);
+}
+
+void test_is_ascii_empty(void)
+{
+    string *s = String()->new("");
+    int result = String()->is_ascii(s);
+    ASSERT(result == 0 || result == 1);
+    String()->del(&s);
+}
+
+void test_is_ascii_null(void)
+{
+    ASSERT_EQ(String()->is_ascii(NULL), 0);
+}
+
+// ============================================================================
 // Edge Cases
 // ============================================================================
 
@@ -909,6 +1122,58 @@ int main(int argc, char **argv)
     TEST("last_index_of: empty string", test_last_index_of_empty_string());
     TEST_NULL_SAFE("last_index_of: NULL string", test_last_index_of_null_string());
     TEST_NULL_SAFE("last_index_of: NULL value", test_last_index_of_null_value());
+    
+    // ─────────────────────────────────────────────────────────────────────
+    // String()->is_null tests
+    // ─────────────────────────────────────────────────────────────────────
+    print_suite_header("String()->is_null");
+    
+    TEST("is_null: NULL pointer", test_is_null_with_null_ptr());
+    TEST("is_null: valid string", test_is_null_with_valid_string());
+    TEST("is_null: empty string", test_is_null_with_empty_string());
+    
+    // ─────────────────────────────────────────────────────────────────────
+    // String()->is_alpha tests
+    // ─────────────────────────────────────────────────────────────────────
+    print_suite_header("String()->is_alpha");
+    
+    TEST("is_alpha: all lower", test_is_alpha_all_lower());
+    TEST("is_alpha: all upper", test_is_alpha_all_upper());
+    TEST("is_alpha: mixed case", test_is_alpha_mixed_case());
+    TEST("is_alpha: with numbers", test_is_alpha_with_numbers());
+    TEST("is_alpha: with space", test_is_alpha_with_space());
+    TEST("is_alpha: with symbols", test_is_alpha_with_symbols());
+    TEST("is_alpha: empty string", test_is_alpha_empty());
+    TEST_NULL_SAFE("is_alpha: NULL input", test_is_alpha_null());
+    
+    // ─────────────────────────────────────────────────────────────────────
+    // String()->is_alnum tests
+    // ─────────────────────────────────────────────────────────────────────
+    print_suite_header("String()->is_alnum");
+    
+    TEST("is_alnum: all alpha", test_is_alnum_all_alpha());
+    TEST("is_alnum: all digits", test_is_alnum_all_digits());
+    TEST("is_alnum: mixed", test_is_alnum_mixed());
+    TEST("is_alnum: with space", test_is_alnum_with_space());
+    TEST("is_alnum: with symbols", test_is_alnum_with_symbols());
+    TEST("is_alnum: with underscore", test_is_alnum_with_underscore());
+    TEST("is_alnum: empty string", test_is_alnum_empty());
+    TEST_NULL_SAFE("is_alnum: NULL input", test_is_alnum_null());
+    
+    // ─────────────────────────────────────────────────────────────────────
+    // String()->is_ascii tests
+    // ─────────────────────────────────────────────────────────────────────
+    print_suite_header("String()->is_ascii");
+    
+    TEST("is_ascii: basic", test_is_ascii_basic());
+    TEST("is_ascii: all printable", test_is_ascii_all_printable());
+    TEST("is_ascii: special chars", test_is_ascii_special_chars());
+    TEST("is_ascii: with newline", test_is_ascii_with_newline());
+    TEST("is_ascii: with tab", test_is_ascii_with_tab());
+    TEST("is_ascii: with high byte", test_is_ascii_with_high_byte());
+    TEST("is_ascii: with utf8", test_is_ascii_with_utf8());
+    TEST("is_ascii: empty string", test_is_ascii_empty());
+    TEST_NULL_SAFE("is_ascii: NULL input", test_is_ascii_null());
     
     // ─────────────────────────────────────────────────────────────────────
     // Edge case tests
