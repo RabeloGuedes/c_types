@@ -2020,6 +2020,35 @@ void test_trim_null(void)
 }
 
 // ============================================================================
+// Test Functions for String()->init
+// ============================================================================
+
+void test_init_on_new_string(void)
+{
+    // Create a string then init it - should reset to empty state
+    string *s = String()->new("hello world");
+    ASSERT_NOT_NULL(s);
+    ASSERT_EQ(String()->len(s), 11);
+    
+    // After init, the internal char* is set to NULL
+    // This effectively "clears" the string (but doesn't free the outer struct)
+    String()->init(s);
+    
+    // After init, len should be 0
+    ASSERT_EQ(String()->len(s), 0);
+    
+    // Note: We can't properly del this now since init set s to NULL
+    // and del would try to free NULL which is fine
+    // But the original char* is leaked - init is for stack-allocated strings
+    free(s);  // Just free the struct itself
+}
+
+void test_init_null(void)
+{
+    String()->init(NULL);
+}
+
+// ============================================================================
 // Edge Cases
 // ============================================================================
 
@@ -2474,6 +2503,14 @@ int main(int argc, char **argv)
     TEST("trim: only whitespace", test_trim_only_whitespace());
     TEST("trim: empty string", test_trim_empty());
     TEST_NULL_SAFE("trim: NULL input", test_trim_null());
+    
+    // ─────────────────────────────────────────────────────────────────────
+    // String()->init tests
+    // ─────────────────────────────────────────────────────────────────────
+    print_suite_header("String()->init");
+    
+    TEST("init: on new string", test_init_on_new_string());
+    TEST_NULL_SAFE("init: NULL input", test_init_null());
     
     // ─────────────────────────────────────────────────────────────────────
     // Edge case tests
