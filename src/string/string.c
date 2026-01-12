@@ -949,6 +949,17 @@ void  trim_string(string *str)
   str->capacity = new_len + 1;
 }
 
+/// @brief This function set the string internal variables to zero.
+/// @param str 
+void  init_string(string *str)
+{
+  if (!str)
+    return ;
+  str->s = NULL;
+  str->capacity = 0;
+  str->len = 0;
+}
+
 /// @brief This function returns a struct with all functions that
 /// can be used with the string type.
 /// @param  
@@ -986,5 +997,6 @@ str_funcs   *String(void)
   string_functions.capitalize = &capitalize_string;
   string_functions.substring = &substring;
   string_functions.trim = &trim_string;
+  string_functions.init = &init_string;
   return (&string_functions);
 }
