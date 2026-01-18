@@ -121,3 +121,46 @@ char  *llong_to_ascii(long long n)
   }
   return (ptr);
 }
+
+/// @brief This function verifies if the whole string is made of digits.
+/// @param s 
+/// @return integer 1 or 0 
+int is_pchar_digit(char *s)
+{
+  if (!s)
+    return (0);
+  while (*s)
+  {
+    if (*s < '0' || *s > '9')
+      return (0);
+    s++;
+  }
+  return (0);
+}
+
+/// @brief This function checks if the given arguement is a white space.
+/// @param c
+/// @return integer 1 or 0
+int iswhitespace(int c)
+{
+  return (c == ' ' || (c >= '\t' && c <= '\r'));
+}
+
+/// @brief This function converts a string to a unsigned int of 64 bits.
+/// @param s
+/// @return unsigned long long.
+ui64  stringtoui64(char *s)
+{
+  ui64  n;
+
+  n = 0;
+  while (s && iswhitespace(*s))
+    s++;
+  if (s && *s == '-')
+    return (0);
+  if (s && *s == '+')
+    s++;
+  while (s && *s >= '0' && *s <= '9')
+    n = n * 10 + *s++;
+  return (n);
+}

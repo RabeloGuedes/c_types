@@ -4,12 +4,16 @@
 # include <stdlib.h>
 # include <unistd.h>
 
+typedef unsigned int ui32;
+
 typedef unsigned long long ui64;
 
-void  memorycopy(void *dst, void *src, ui64 bytes);
-ui64  stringlen(char *s);
-void  memoryset(void *ptr, int c, ui64 bytes);
-char  *int_to_ascii(int n);
-char  *llong_to_ascii(long long n);
+void    memorycopy(void *dst, void *src, ui64 bytes);
+ui64    stringlen(char *s);
+void    memoryset(void *ptr, int c, ui64 bytes);
+char    *int_to_ascii(int n);
+char    *llong_to_ascii(long long n);
+int     is_pchar_digit(char *s);
+int     iswhitespace(int c);
 
 #endif
